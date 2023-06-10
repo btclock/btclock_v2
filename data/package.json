@@ -1,0 +1,23 @@
+{
+  "name": "data",
+  "packageManager": "yarn@3.2.1",
+  "scripts": {
+    "build": "node esbuild.mjs"
+  },
+  "dependencies": {
+    "esbuild": "0.18.0"
+  },
+  "devDependencies": {
+    "@chialab/esbuild-plugin-html": "^0.17.2",
+    "@craftamap/esbuild-plugin-html": "^0.5.0",
+    "@esbuilder/html": "^0.0.6",
+    "autoprefixer": "^10.4.14",
+    "bootstrap": "^5.3.0",
+    "esbuild-plugin-clean": "^1.0.1",
+    "esbuild-plugin-handlebars": "^1.0.2",
+    "esbuild-sass-plugin": "^2.9.0",
+    "handlebars": "^4.7.7",
+    "postcss": "^8.4.24",
+    "typescript": "^5.1.3"
+  }
+}

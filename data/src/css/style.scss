@@ -1,0 +1,110 @@
+// @import "../node_modules/bootstrap/scss/bootstrap";
+
+@import "../node_modules/bootstrap/scss/functions";
+@import "../node_modules/bootstrap/scss/variables";
+@import "../node_modules/bootstrap/scss/variables-dark";
+
+@import "../node_modules/bootstrap/scss/mixins";
+@import "../node_modules/bootstrap/scss/maps";
+@import "../node_modules/bootstrap/scss/utilities";
+
+@import "../node_modules/bootstrap/scss/root";
+@import "../node_modules/bootstrap/scss/reboot";
+@import "../node_modules/bootstrap/scss/type";
+@import "../node_modules/bootstrap/scss/containers";
+@import "../node_modules/bootstrap/scss/grid";
+@import "../node_modules/bootstrap/scss/forms";
+@import "../node_modules/bootstrap/scss/buttons";
+@import "../node_modules/bootstrap/scss/navbar";
+@import "../node_modules/bootstrap/scss/nav";
+@import "../node_modules/bootstrap/scss/card";
+
+@import "../node_modules/bootstrap/scss/helpers";
+@import "../node_modules/bootstrap/scss/utilities/api";
+
+
+@font-face {
+    font-display: swap;
+    /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+    font-family: 'Oswald';
+    font-style: normal;
+    font-weight: 400;
+    src: url('oswald.woff2') format('woff2'),
+        /* Chrome 36+, Opera 23+, Firefox 39+ */
+        url('oswald.woff') format('woff');
+    /* Chrome 5+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
+nav {
+    margin-bottom: 15px;
+}
+
+.splitText div:first-child::after {
+    display: block;
+    content: '';
+    margin-top: 0px;
+    border-bottom: 2px solid;
+    margin-bottom: 3px;
+}
+
+#btcclock-wrapper {
+    margin: 0 auto;
+}
+
+.btclock {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    align-content: stretch;
+    font-family: 'Oswald', sans-serif;
+}
+
+.btclock>div {
+    padding: 5px;
+}
+
+.fg-ffff .btclock>div {
+    color: #fff;
+    border-color: #fff;
+}
+
+.bg-ffff .btclock>div {
+    background: #fff;
+}
+
+.fg-f800 .btclock>div {
+    color: #f00;
+    border-color: #f00;
+}
+
+.bg-f800 .btclock>div {
+    background: #f00;
+}
+
+.fg-0 .btclock>div {
+    color: #000;
+    border-color: #000;
+}
+
+.bg-0 .btclock>div {
+    background: #000;
+}
+
+.splitText {
+    font-size: 2.2rem;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    text-align: center;
+}
+
+.digit {
+    font-size: 5rem;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.digit-blank {
+    content: "abc";
+}
