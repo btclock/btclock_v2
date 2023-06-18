@@ -2,15 +2,14 @@
 
 #ifdef IS_S3
 // reversed
-const int EPD_CS[7] = {17, 21, 33, 10, 6, 4, 2};
-const int EPD_BUSY[7] = {16, 18, 37, 9, 7, 5, 3};
-const int EPD_RESET_MPD[7] = {14, 13, 12, 11, 10, 9, 8};
+// const int EPD_CS[7] = {17, 21, 33, 10, 6, 4, 2};
+// const int EPD_BUSY[7] = {16, 18, 37, 9, 7, 5, 3};
+// const int EPD_RESET_MPD[7] = {14, 13, 12, 11, 10, 9, 8};
 
-//const int EPD_CS[7] = {2, 4, 6, 10, 33, 21, 17};
-//const int EPD_BUSY[7] = {3, 5, 7, 9, 37, 18, 16};
-//const int EPD_RESET_MPD[7] = {8, 9, 10, 11, 12, 13, 14};
-// const int EPD_CS[7] = {2, 4, 10, 38, 34, 21, 17};
-// const int EPD_BUSY[7] = {3, 5, 9, 36, 35, 18, 16};
+const int EPD_CS[7] = {2, 4, 6, 10, 33, 21, 17};
+const int EPD_BUSY[7] = {3, 5, 7, 9, 37, 18, 16};
+const int EPD_RESET_MPD[7] = {8, 9, 10, 11, 12, 13, 14};
+
 const int EPD_DC = 14;
 const int RST_PIN = 15;
 #elif defined(IS_S2)
@@ -90,6 +89,7 @@ void setupDisplays()
 
 void resetAllDisplays()
 {
+    #ifdef NO_MCP
     digitalWrite(RST_PIN, HIGH);
     pinMode(RST_PIN, OUTPUT);
     delay(20);
@@ -97,16 +97,11 @@ void resetAllDisplays()
     delay(20);
     digitalWrite(RST_PIN, HIGH);
     delay(200);
-
-    // for (int i = 8; i < 16; i++) {
-    //     mcp.digitalWrite(i, HIGH);
-    //     mcp.pinMode(i, OUTPUT);
-    //     delay(20);
-    //     mcp.digitalWrite(i, LOW);
-    //     delay(20);
-    //     mcp.digitalWrite(i, HIGH);
-    //     delay(200);
-    // }
+    #else 
+    for (int i = 0; i < displaySize; i++) {
+        resetSingleDisplay(i);
+    }
+    #endif NO_MCP
 }
 
 void resetSingleDisplay(int i)
@@ -318,10 +313,8 @@ void updateDisplay(void *pvParameters)
         if (epdContent[epdIndex].compareTo(currentEpdContent[epdIndex]) != 0)
         {
             currentEpdContent[epdIndex] = epdContent[epdIndex];
-// resetSingleDisplay(epdIndex);
 #ifndef NO_MCP
             displays[epdIndex].init(0, false);
-            delay(displays[epdIndex].epd2.power_on_time);
             resetSingleDisplay(epdIndex);
 #endif
             // displays[epdIndex].init(0, false);
@@ -344,7 +337,6 @@ void updateDisplay(void *pvParameters)
             }
 
             displays[epdIndex].display(updatePartial);
-            // displays[epdIndex].powerOff();
             displays[epdIndex].hibernate();
 #endif
         }
@@ -356,9 +348,8 @@ void showSetupQr(String ssid, String password)
 {
     int displayIndex = 6;
     
-    const String text = "WIFI:S:" + ssid + ";T:WPA;P:" + password + ";;"; // User-supplied text
+    const String text = "WIFI:S:" + ssid + ";T:WPA;P:" + password + ";;"; 
 
-//    genQrCode(text, &qrcode);
     uint8_t tempBuffer[qrcodegen_BUFFER_LEN_MAX];
     bool ok = qrcodegen_encodeText(text.c_str(), tempBuffer, qrcode, qrcodegen_Ecc_LOW,
                                 qrcodegen_VERSION_MIN, qrcodegen_VERSION_MAX, qrcodegen_Mask_AUTO, true);
@@ -367,8 +358,7 @@ void showSetupQr(String ssid, String password)
 
     const int padding = floor(float(displays[displayIndex].width() - (size * 4)) / 2);
     const int paddingY = floor(float(displays[displayIndex].height() - (size * 4)) / 2);
-    //  displays[displayIndex].setRotation(0);
-   // displays[displayIndex].setFullWindow();
+ 
     displays[displayIndex].setPartialWindow(0, 0, displays[displayIndex].width(), displays[displayIndex].height());
     displays[displayIndex].firstPage();
 
@@ -439,8 +429,6 @@ void showSetupQr(String ssid, String password)
 
     for (int i = 1; i < displaySize; (i = i+2)) {
         displays[i].setPartialWindow(0, 0, displays[i].width(), displays[i].height());
-//        displays[i].firstPage();
-
         displays[i].fillScreen(GxEPD_WHITE);
         displays[i].display(true);
     }

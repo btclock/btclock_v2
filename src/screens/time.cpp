@@ -26,6 +26,10 @@ void TimeScreen::onNewMinute() {
     TimeScreen::showScreen();
 }
 
+void TimeScreen::onActivate() {
+    TimeScreen::showScreen();
+}
+
 std::array<String, 7> TimeScreen::getEpdContent() {
     return TimeScreen::epdContent;
 }

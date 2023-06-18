@@ -34,6 +34,7 @@ extern uint32_t moment;
 
 #ifndef NO_MCP
 extern Adafruit_MCP23X17 mcp;
+extern const int MCP_INT_PIN;
 #endif
 #ifdef WITH_RGB_LED
 extern Adafruit_NeoPixel pixels;

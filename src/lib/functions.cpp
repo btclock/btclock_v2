@@ -7,6 +7,8 @@ std::map<int, std::string> screenNameMap;
 
 #ifndef NO_MCP
 Adafruit_MCP23X17 mcp;
+const int MCP_INT_PIN = 8; 
+
 #endif
 bool timerRunning = true;
 int fgColor;
@@ -49,6 +51,8 @@ void setupComponents()
     else
     {
         Serial.println("MCP23017 ok");
+        pinMode(MCP_INT_PIN, INPUT); 
+        mcp.setupInterrupts(true, false, LOW);
     }
 #endif
 
@@ -65,6 +69,7 @@ void setupComponents()
     for (int i = 0; i < 4; i++)
     {
         mcp.pinMode(i, INPUT_PULLUP);
+        mcp.setupInterruptPin(i, LOW);
     }
 #endif
 }
@@ -112,12 +117,13 @@ void setupPreferences()
     // screenNameMap = {{SCREEN_BLOCK_HEIGHT, "Block Height"};
 
     screenNameMap = {{SCREEN_BLOCK_HEIGHT, "Block Height"},
-                   {SCREEN_MSCW_TIME, "Sats per dollar"},
-                   {SCREEN_BTC_TICKER, "Ticker"},
-                   {SCREEN_TIME, "Time"},
-                   {SCREEN_HALVING_COUNTDOWN, "Halving countdown"}};
+                     {SCREEN_MSCW_TIME, "Sats per dollar"},
+                     {SCREEN_BTC_TICKER, "Ticker"},
+                     {SCREEN_TIME, "Time"},
+                     {SCREEN_HALVING_COUNTDOWN, "Halving countdown"}};
 
-    for (int i = 0; i < screenNameMap.size() ; i++) {
+    for (int i = 0; i < screenNameMap.size(); i++)
+    {
         String key = "screen" + String(i) + "Visible";
         screenVisible[i] = preferences.getBool(key.c_str(), true); // Default to true if not set
     }
@@ -149,8 +155,9 @@ void handleScreenTasks(uint screen)
     switch (currentScreen)
     {
     case SCREEN_BLOCK_HEIGHT:
-        if (blockNotifyTaskHandle)
+        if (blockNotifyTaskHandle) {
             vTaskResume(blockNotifyTaskHandle);
+        }
         break;
     case SCREEN_HALVING_COUNTDOWN:
         if (blockNotifyTaskHandle)
@@ -165,8 +172,10 @@ void handleScreenTasks(uint screen)
             vTaskResume(getPriceTaskHandle);
         break;
     case SCREEN_TIME:
-        if (minuteTaskHandle)
+        if (minuteTaskHandle) {
+            TimeScreen::onActivate();
             vTaskResume(minuteTaskHandle);
+        }
         break;
     }
 }
@@ -192,7 +201,8 @@ void timebasedChangeTask(void *parameter)
             int newCurrentScreen = (getCurrentScreen() + 1) % screenCount;
             String key = "screen" + String(newCurrentScreen) + "Visible";
 
-            while (!preferences.getBool(key.c_str(), true)) {
+            while (!preferences.getBool(key.c_str(), true))
+            {
                 newCurrentScreen = (newCurrentScreen + 1) % screenCount;
                 key = "screen" + String(newCurrentScreen) + "Visible";
             }
@@ -201,6 +211,36 @@ void timebasedChangeTask(void *parameter)
         }
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
+}
+
+int modulo(int x,int N) {
+    return (x % N + N) %N;
+}
+
+void nextScreen()
+{
+    int newCurrentScreen = (getCurrentScreen() + 1) % screenCount;
+    String key = "screen" + String(newCurrentScreen) + "Visible";
+
+    while (!preferences.getBool(key.c_str(), true))
+    {
+        newCurrentScreen = (newCurrentScreen + 1) % screenCount;
+        key = "screen" + String(newCurrentScreen) + "Visible";
+    }
+    setCurrentScreen(newCurrentScreen);
+}
+
+void previousScreen()
+{
+    int newCurrentScreen = modulo(getCurrentScreen() - 1, screenCount);
+    String key = "screen" + String(newCurrentScreen) + "Visible";
+
+    while (!preferences.getBool(key.c_str(), true))
+    {
+        newCurrentScreen = modulo(newCurrentScreen - 1,  screenCount);
+        key = "screen" + String(newCurrentScreen) + "Visible";
+    }
+    setCurrentScreen(newCurrentScreen);
 }
 
 void setLights(int r, int g, int b)

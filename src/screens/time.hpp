@@ -15,6 +15,7 @@ class TimeScreen {
         static void init();
         static void showScreen();
         static void onNewMinute();
+        static void onActivate();
         static std::array<String, 7> getEpdContent();
         static TimeScreen* getInstance();
 };

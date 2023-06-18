@@ -28,3 +28,6 @@ int getBgColor();
 int getFgColor();
 
 void setupSoftAP();
+void nextScreen();
+void previousScreen();
+int modulo(int x,int N);

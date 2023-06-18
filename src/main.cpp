@@ -33,9 +33,6 @@ ESP32Time rtc(3600);
 void setup()
 {
   Serial.begin(115200);
-#ifdef ARDUINO_LOLIN_S3
-  delay(2500);
-#endif
 
 #ifdef ARDUINO_ESP32S3_DEV
   pinMode(LED_BUILTIN, OUTPUT);

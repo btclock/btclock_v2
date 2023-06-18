@@ -1,30 +1,68 @@
+/**
+ * Button 1: No functionality
+ * Button 2: Next Screen
+ * Button 3: Previous Screen
+ * Button 4: Queue full EPD update
+*/
+
 #include "button.hpp"
 #ifndef NO_MCP
 TaskHandle_t buttonTaskHandle = NULL;
 // Define a type for the event callback
 std::vector<EventCallback> buttonEventCallbacks; // Define a vector to hold multiple event callbacks
-
+volatile boolean buttonPressed = false;
 
 void buttonTask(void *parameter)
 {
     while (1)
     {
-        for (int i = 0; i < 4; i++)
+        if (!digitalRead(MCP_INT_PIN))
         {
-            if (!mcp.digitalRead(i))
-            {
-                Serial.println("Button " + String(i) + " Pressed!");
-                delay(250);
+            uint pin = mcp.getLastInterruptPin();
+            if (pin == 3) {
+                xTaskCreate(fullRefresh, "FullRefresh", 2048, NULL, 1, NULL); 
             }
+            else if (pin == 1)
+            {
+                nextScreen();
+            }
+            else if (pin == 2)
+            {
+                previousScreen();
+            }
+
+            vTaskDelay(250); // debounce
+            mcp.clearInterrupts(); // clear
         }
 
         vTaskDelay(pdMS_TO_TICKS(250));
     }
 }
 
+void IRAM_ATTR handleButtonInterrupt()
+{
+    buttonPressed = true;
+    // Serial.println("ISR");
+    // uint pin = mcp.getLastInterruptPin();
+
+    // if (pin == 1)
+    // {
+    //     nextScreen();
+    // }
+    // else if (pin == 2)
+    // {
+    //     previousScreen();
+    // }
+    // vTaskDelay(pdMS_TO_TICKS(250));
+
+    // mcp.clearInterrupts();
+}
+
 void setupButtonTask()
 {
-    xTaskCreate(buttonTask, "MinuteTask", 2048, NULL, 1, &buttonTaskHandle); // Create the FreeRTOS task
+    xTaskCreate(buttonTask, "ButtonTask", 4096, NULL, 1, &buttonTaskHandle); // Create the FreeRTOS task
+    // Use interrupt instead of task
+    // attachInterrupt(MCP_INT_PIN, handleButtonInterrupt, FALLING);
 }
 
 void registerNewButtonCallback(EventCallback cb)
