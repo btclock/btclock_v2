@@ -142,6 +142,11 @@ void onApiSettingsGet(AsyncWebServerRequest *request)
     root["bgColor"] = getBgColor();
     root["timerSeconds"] = timerSeconds;
     root["timerRunning"] = timerRunning;
+    root["tzOffset"] = preferences.getUInt("gmtOffset", TIME_OFFSET_SECONDS) / 60;
+    root["useBitcoinNode"] = preferences.getBool("useNode", false);
+    root["rpcPort"] = preferences.getUInt("rpcPort", BITCOIND_PORT);
+    root["rpcUser"] = preferences.getString("rpcUser", BITCOIND_RPC_USER);
+    root["rpcHost"] = preferences.getString("rpcHost", BITCOIND_HOST);
 #ifdef IS_BW
     root["epdColors"] = 2;
 #else
@@ -219,12 +224,39 @@ void onApiSettingsPost(AsyncWebServerRequest *request)
         preferences.putBool(prefKey.c_str(), visible);
     }
 
-     if (request->hasParam("timePerScreen", true))
+    if (request->hasParam("tzOffset", true))
+    {
+        AsyncWebParameter *p = request->getParam("tzOffset", true);
+        int tzOffsetSeconds = p->value().toInt() * 60;
+        preferences.putUInt("tzOffset", tzOffsetSeconds);
+        settingsChanged = true;
+    }
+
+    if (request->hasParam("timePerScreen", true))
     {
         AsyncWebParameter *p = request->getParam("timePerScreen", true);
         timerSeconds = p->value().toInt() * 60;
         preferences.putUInt("timerSeconds", timerSeconds);
         settingsChanged = true;
+    }
+
+    if (request->hasParam("useBitcoinNode", true))
+    {
+        AsyncWebParameter *p = request->getParam("useBitcoinNode", true);
+        bool useBitcoinNode = p->value().toInt();
+        preferences.putBool("useNode", useBitcoinNode);
+        settingsChanged = true;
+
+        String rpcVars[] = {"rpcHost", "rpcPort", "rpcUser", "rpcPass"};
+
+        for (String v : rpcVars)
+        {
+            if (request->hasParam(v, true))
+            {
+                AsyncWebParameter *pv = request->getParam(v, true);
+                preferences.putString(v.c_str(), pv->value().c_str());
+            }
+        }
     }
 
     request->send(200);

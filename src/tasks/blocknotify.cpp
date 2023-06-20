@@ -20,7 +20,7 @@ void checkBitcoinBlock(void *pvParameters)
     int blockHeight = preferences.getUInt("blockHeight", currentBlockHeight);
     HTTPClient http;
     http.setReuse(true);
-    useBitcoind = wifiClientInsecure.connect(BITCOIND_HOST, BITCOIND_PORT);
+    useBitcoind = wifiClientInsecure.connect(preferences.getString("rpcHost", BITCOIND_HOST).c_str(), preferences.getUInt("rpcPort", BITCOIND_PORT));
     if (useBitcoind)
         Serial.println("bitcoind node is reachable, using this for blocks.");
     else
@@ -32,10 +32,10 @@ void checkBitcoinBlock(void *pvParameters)
         {
             StaticJsonDocument<200> jsonDoc;
 
-            http.begin(BITCOIND_HOST, BITCOIND_PORT);
+            http.begin(preferences.getString("rpcHost", BITCOIND_HOST).c_str(), preferences.getUInt("rpcPort", BITCOIND_PORT));
             http.addHeader("Content-Type", "application/json");
             String payload = "{\"jsonrpc\":\"1.0\",\"id\":\"current_block_height\",\"method\":\"getblockcount\",\"params\":[]}";
-            String auth = String(BITCOIND_RPC_USER) + ":" + String(BITCOIND_RPC_PASS);
+            String auth = preferences.getString("rpcUser", BITCOIND_RPC_USER) + ":" + preferences.getString("rpcPass", BITCOIND_RPC_PASS);
             String authEncoded = base64::encode(auth);
             http.addHeader("Authorization", "Basic " + authEncoded);
 

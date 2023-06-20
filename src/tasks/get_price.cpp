@@ -21,20 +21,21 @@ void taskGetPrice(void *pvParameters)
         int httpCode = http.GET();
 
         // Parse JSON response and extract average price
-        float price;
+        float usdPrice, eurPrice;
         if (httpCode == 200)
         {
             String payload = http.getString();
-            //Serial.println(payload);
             StaticJsonDocument<768> doc;
             deserializeJson(doc, payload);
             JsonObject bpi = doc["bpi"];
-            price = bpi["USD"]["rate_float"];
+            usdPrice = bpi["USD"]["rate_float"];
+            eurPrice = bpi["EUR"]["rate_float"];
             for(auto &callback : priceEventCallbacks) { // Loop through all the event callbacks and call them
-                callback(price);
+                callback(usdPrice);
             }
 
-            preferences.putFloat("btcPrice", price);
+            preferences.putFloat("btcPrice", usdPrice);
+            preferences.putFloat("btcPriceEur", eurPrice);
         }
         else
         {
@@ -42,7 +43,6 @@ void taskGetPrice(void *pvParameters)
             Serial.println(httpCode);
         }
 
-        // Disconnect from Wi-Fi network and wait for 60 seconds
         http.end();
         
         vTaskDelay(pdMS_TO_TICKS(PRICE_WAIT_TIME));

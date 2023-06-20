@@ -109,10 +109,20 @@
               <label for="timePerScreen" class="col-sm-6 col-form-label">Time per screen</label>
               <div class="col-sm-6">
                 <div class="input-group mb-3">
-                  <input type="text" name="timePerScreen" id="timePerScreen">
-                  <span class="input-group-text" id="basic-addon2">minutes</span>
+                  <input type="text" name="timePerScreen" id="timePerScreen" class="form-control">
+                  <span class="input-group-text">minutes</span>
                 </div>
 
+              </div>
+            </div>
+            <div class="row">
+              <label for="tzOffset" class="col-sm-6 col-form-label">Timezone offset</label>
+              <div class="col-sm-6">
+                <div class="input-group mb-3">
+                  <input type="number" name="tzOffset" id="tzOffset" class="form-control">
+                  <span class="input-group-text">min</span>
+                  <button class="btn btn-outline-secondary" type="button" id="getTzOffsetBtn">Auto</button>
+                </div>
               </div>
             </div>
             <div class="row">
@@ -121,6 +131,39 @@
                   <input class="form-check-input" type="checkbox" id="ledFlashOnUpdate" name="ledFlashOnUpd" value="1">
                   <label class="form-check-label" for="ledFlashOnUpdate">LED flash on update</label>
                 </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class=" col-sm-6">
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="useBitcoinNode" name="useBitcoinNode" value="1">
+                  <label class="form-check-label" for="useBitcoinNode">Use local node</label>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <label for="rpcHost" class="col-sm-6 col-form-label">Node IP/hostname</label>
+              <div class="col-sm-6">
+                <input type="text" name="rpcHost" id="rpcHost" class="form-control">
+              </div>
+            </div>
+            <div class="row">
+              <label for="rpcPort" class="col-sm-6 col-form-label">RPC port</label>
+              <div class="col-sm-6">
+                <input type="number" name="rpcPort" id="rpcPort" class="form-control">
+              </div>
+            </div>
+            <div class="row">
+              <label for="rpcUser" class="col-sm-6 col-form-label">RPC username</label>
+              <div class="col-sm-6">
+                <input type="text" name="rpcUser" id="rpcUser" class="form-control">
+              </div>
+            </div>
+            <div class="row">
+              <label for="rpcPass" class="col-sm-6 col-form-label">RPC password</label>
+              <div class="col-sm-6">
+                <input type="password" name="rpcPass" id="rpcPass" class="form-control">
+                <div class="form-text">For security, password is not shown after saving.</div>
               </div>
             </div>
             <script id="screens-template" type="text/x-handlebars-template">
@@ -139,7 +182,7 @@
             <button type="submit" class="btn btn-secondary">Reset</button>
             <button type="submit" class="btn btn-primary">Save</button>
           </form>
-          
+
         </div>
       </div>
     </div>

@@ -1,10 +1,9 @@
-//import "./handlebars.js";
 import './helpers.js';
 
 var screens = ["Block Height", "Moscow Time", "Ticker", "Time", "Halving countdown"];
 
 getBcStatus = () => {
-    fetch('http://btclock3.local/api/status', {
+    fetch('/api/status', {
         method: 'get'
     })
         .then(response => response.json())
@@ -22,7 +21,7 @@ getBcStatus = () => {
 interval = setInterval(getBcStatus, 2500);
 getBcStatus();
 
-fetch('http://btclock3.local/api/settings', {
+fetch('/api/settings', {
     method: 'get'
 })
     .then(response => response.json())
@@ -42,6 +41,15 @@ fetch('http://btclock3.local/api/settings', {
         if (jsonData.ledFlashOnUpdate)
             document.getElementById('ledFlashOnUpdate').checked = true;
 
+        if (jsonData.useBitcoinNode)
+            document.getElementById('useBitcoinNode').checked = true;
+        
+        let nodeFields = ["rpcHost", "rpcPort", "rpcUser", "tzOffset"]; 
+
+        for (let n of nodeFields) {
+            document.getElementById(n).value = jsonData[n];
+        }
+
         document.getElementById('timePerScreen').value = jsonData.timerSeconds / 60;
 
         var source = document.getElementById("screens-template").innerHTML;
@@ -54,11 +62,12 @@ fetch('http://btclock3.local/api/settings', {
     });
 
 
+
 var settingsForm = document.querySelector('#settingsForm');
 settingsForm.onsubmit = (event) => {
     var formData = new FormData(settingsForm);
 
-    fetch("http://btclock3.local/api/settings",
+    fetch("/api/settings",
         {
             body: formData,
             method: "post"
@@ -87,6 +96,14 @@ turnOffLedsBtn.onclick = (event) => {
     })
     return false;
 }
+
+let tzOffsetBtn = document.getElementById('getTzOffsetBtn');
+
+if (tzOffsetBtn)
+    tzOffsetBtn.onclick = (event) => {
+        document.getElementById("tzOffset").value = new Date(new Date().getFullYear(), 0, 1).getTimezoneOffset()*-1;
+        return false;
+    };
 
 var textForm = document.querySelector('#customTextForm');
 textForm.onsubmit = (event) => {

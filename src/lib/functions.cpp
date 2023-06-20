@@ -76,12 +76,12 @@ void setupComponents()
 
 void synchronizeTime()
 {
-    configTime(3600, 0, NTP_SERVER);
+    configTime(preferences.getUInt("gmtOffset", TIME_OFFSET_SECONDS), 0, NTP_SERVER);
     struct tm timeinfo;
 
     while (!getLocalTime(&timeinfo))
     {
-        configTime(3600, 0, NTP_SERVER);
+        configTime(preferences.getUInt("gmtOffset", TIME_OFFSET_SECONDS), 0, NTP_SERVER);
         delay(500);
         Serial.println("Retry set time");
     }
@@ -114,7 +114,6 @@ void setupPreferences()
     bgColor = preferences.getUInt("bgColor", DEFAULT_BG_COLOR);
     preferences.getBool("ledFlashOnUpd", false);
 
-    // screenNameMap = {{SCREEN_BLOCK_HEIGHT, "Block Height"};
 
     screenNameMap = {{SCREEN_BLOCK_HEIGHT, "Block Height"},
                      {SCREEN_MSCW_TIME, "Sats per dollar"},
