@@ -7,7 +7,7 @@ std::map<int, std::string> screenNameMap;
 
 #ifndef NO_MCP
 Adafruit_MCP23X17 mcp;
-const int MCP_INT_PIN = 8; 
+const int MCP_INT_PIN = 8;
 
 #endif
 bool timerRunning = true;
@@ -51,17 +51,13 @@ void setupComponents()
     else
     {
         Serial.println("MCP23017 ok");
-        pinMode(MCP_INT_PIN, INPUT); 
+        pinMode(MCP_INT_PIN, INPUT);
         mcp.setupInterrupts(true, false, LOW);
     }
 #endif
 
 #ifdef WITH_RGB_LED
     pixels.begin();
-    pixels.setPixelColor(0, pixels.Color(255, 0, 0));
-    pixels.setPixelColor(1, pixels.Color(0, 255, 0));
-    pixels.setPixelColor(2, pixels.Color(0, 0, 255));
-    pixels.setPixelColor(3, pixels.Color(255, 255, 255));
     pixels.show();
 #endif
 
@@ -114,12 +110,20 @@ void setupPreferences()
     bgColor = preferences.getUInt("bgColor", DEFAULT_BG_COLOR);
     preferences.getBool("ledFlashOnUpd", false);
 
-
     screenNameMap = {{SCREEN_BLOCK_HEIGHT, "Block Height"},
                      {SCREEN_MSCW_TIME, "Sats per dollar"},
                      {SCREEN_BTC_TICKER, "Ticker"},
                      {SCREEN_TIME, "Time"},
                      {SCREEN_HALVING_COUNTDOWN, "Halving countdown"}};
+
+#ifdef WITH_RGB_LED
+    pixels.setBrightness(preferences.getUInt("ledBrightness", 128));
+    pixels.setPixelColor(0, pixels.Color(255, 0, 0));
+    pixels.setPixelColor(1, pixels.Color(0, 255, 0));
+    pixels.setPixelColor(2, pixels.Color(0, 0, 255));
+    pixels.setPixelColor(3, pixels.Color(255, 255, 255));
+    pixels.show();
+#endif
 
     for (int i = 0; i < screenNameMap.size(); i++)
     {
@@ -154,7 +158,8 @@ void handleScreenTasks(uint screen)
     switch (currentScreen)
     {
     case SCREEN_BLOCK_HEIGHT:
-        if (blockNotifyTaskHandle) {
+        if (blockNotifyTaskHandle)
+        {
             vTaskResume(blockNotifyTaskHandle);
         }
         break;
@@ -171,7 +176,8 @@ void handleScreenTasks(uint screen)
             vTaskResume(getPriceTaskHandle);
         break;
     case SCREEN_TIME:
-        if (minuteTaskHandle) {
+        if (minuteTaskHandle)
+        {
             TimeScreen::onActivate();
             vTaskResume(minuteTaskHandle);
         }
@@ -212,8 +218,9 @@ void timebasedChangeTask(void *parameter)
     }
 }
 
-int modulo(int x,int N) {
-    return (x % N + N) %N;
+int modulo(int x, int N)
+{
+    return (x % N + N) % N;
 }
 
 void nextScreen()
@@ -236,7 +243,7 @@ void previousScreen()
 
     while (!preferences.getBool(key.c_str(), true))
     {
-        newCurrentScreen = modulo(newCurrentScreen - 1,  screenCount);
+        newCurrentScreen = modulo(newCurrentScreen - 1, screenCount);
         key = "screen" + String(newCurrentScreen) + "Visible";
     }
     setCurrentScreen(newCurrentScreen);
@@ -252,4 +259,32 @@ void setLights(int r, int g, int b)
 
     pixels.show();
 #endif
+}
+
+void setupI2C()
+{
+    bool slaveMode = preferences.getBool("I2CSlaveMode", false);
+
+    if (slaveMode)
+    {
+        Serial.println("I2C Slave Mode enabled");
+        Wire.onReceive(onI2CReceive);
+        Wire.begin((uint8_t)I2C_DEV_ADDR);
+    }
+}
+
+void onI2CReceive(int len)
+{
+    Serial.printf("onReceive[%d]: ", len);
+    while (Wire.available())
+    {
+        Serial.write(Wire.read());
+    }
+    Serial.println();
+}
+
+void onI2CRequest()
+{
+    Wire.print("I2C Packets.");
+    Serial.println("onRequest");
 }

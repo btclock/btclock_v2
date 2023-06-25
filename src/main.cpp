@@ -3,7 +3,7 @@
 #include <shared.hpp>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
-//#include <ESP32Time.h>
+// #include <ESP32Time.h>
 #include <WiFiManager.h>
 
 #ifdef CONFIG_BT_ENABLED
@@ -54,30 +54,37 @@ void setup()
 #endif
   setupWifi();
 
-  synchronizeTime();
-  setupWebserver();
+  bool slaveMode = preferences.getBool("I2CSlaveMode", false);
 
-  TimeScreen::init();
-  BlockHeightScreen::init();
-  TickerScreen::init();
-  SatsPerDollarScreen::init();
+  if (!slaveMode)
+  {
+    synchronizeTime();
+    setupWebserver();
+
+    TimeScreen::init();
+    BlockHeightScreen::init();
+    TickerScreen::init();
+    SatsPerDollarScreen::init();
 
 #ifdef WITH_BUTTONS
-  setupButtonTask();
+    setupButtonTask();
 #endif
 
 #ifdef WITH_RGB_LED
-  setLights(0,0,0);
-  setupLedHandlerTask();
+    setLights(0, 0, 0);
+    setupLedHandlerTask();
 #endif
 
-  registerNewMinuteCallback(TimeScreen::onNewMinute);
-  registerNewBlockCallback(BlockHeightScreen::onNewBlock);
-  registerNewBlockCallback(HalvingCountdownScreen::onNewBlock);
-  registerNewPriceCallback(TickerScreen::onPriceUpdate);
-  registerNewPriceCallback(SatsPerDollarScreen::onPriceUpdate);
+    registerNewMinuteCallback(TimeScreen::onNewMinute);
+    registerNewBlockCallback(BlockHeightScreen::onNewBlock);
+    registerNewBlockCallback(HalvingCountdownScreen::onNewBlock);
+    registerNewPriceCallback(TickerScreen::onPriceUpdate);
+    registerNewPriceCallback(SatsPerDollarScreen::onPriceUpdate);
 
-  setupDisplays();
+    setupDisplays();
+  } else {
+    setupI2C();
+  }
 }
 
 void loop()

@@ -153,7 +153,7 @@ void onApiSettingsGet(AsyncWebServerRequest *request)
     root["epdColors"] = 3;
 #endif
     root["ledFlashOnUpdate"] = preferences.getBool("ledFlashOnUpd", false);
-
+    root["ledBrightness"] = preferences.getUInt("ledBrightness", 128);
     JsonArray screens = root.createNestedArray("screens");
 
     for (int i = 0; i < screenNameMap.size(); i++)
@@ -205,6 +205,16 @@ void onApiSettingsPost(AsyncWebServerRequest *request)
     {
         preferences.putBool("ledFlashOnUpd", 0);
         Serial.print("Setting led flash on update to false");
+        settingsChanged = true;
+    }
+
+    if (request->hasParam("ledBrightness", true))
+    {
+        AsyncWebParameter *ledBrightness = request->getParam("ledBrightness", true);
+
+        preferences.putUInt("ledBrightness", ledBrightness->value().toInt());
+        Serial.print("Setting brightness to ");
+        Serial.println(ledBrightness->value().c_str());
         settingsChanged = true;
     }
 

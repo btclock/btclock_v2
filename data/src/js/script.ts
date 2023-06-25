@@ -51,6 +51,7 @@ fetch('/api/settings', {
         }
 
         document.getElementById('timePerScreen').value = jsonData.timerSeconds / 60;
+        document.getElementById('ledBrightness').value = jsonData.ledBrightness;
 
         var source = document.getElementById("screens-template").innerHTML;
         var template = Handlebars.compile(source);

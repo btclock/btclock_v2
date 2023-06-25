@@ -41,7 +41,7 @@ const int EPD_BUSY[7] = {36, 39, 34, 35, 32, 33, 25};
 const int EPD_RESET_MPD[7] = {8, 9, 10, 11, 12, 13, 14};
 
 const int EPD_DC = 22;
-const int RST_PIN = 12;
+const int RST_PIN = 2;
 #endif
 
 #ifdef IS_BW
