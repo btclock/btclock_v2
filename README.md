@@ -1,6 +1,7 @@
 # BTClock v2
 
 Improved code for BTClock with many features.
+Don't forget to copy `config.h.example` to `config.h`. Not necessary to adapt it, since everything should be configurable through the WebUI.
 
 ## Software
 
