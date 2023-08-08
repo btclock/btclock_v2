@@ -36,29 +36,49 @@ void setupSoftAP()
     byte mac[6];
     WiFi.macAddress(mac);
     softAP_SSID = String("BTClock" + String(mac[3], 16) + String(mac[1], 16));
-    softAP_password = base64::encode(String(mac[2]) + String(mac[4]) + String(mac[5])).substring(2, 12);
+    WiFi.setHostname(softAP_SSID.c_str());
+    softAP_password = base64::encode(String(mac[2], 16) + String(mac[4], 16) + String(mac[5], 16) + String(mac[6], 16)).substring(2, 12);
 }
 
 void setupComponents()
 {
+
+#ifdef WITH_RGB_LED
+    pixels.begin();
+    pixels.setPixelColor(0, pixels.Color(255, 0, 0));
+    pixels.setPixelColor(1, pixels.Color(0, 255, 0));
+    pixels.setPixelColor(2, pixels.Color(0, 0, 255));
+    pixels.setPixelColor(3, pixels.Color(255, 255, 255));
+    pixels.show();
+#endif
+
+//delay(3000);
+//Serial.println("Leds should be on");
+
 #ifndef NO_MCP
     if (!mcp.begin_I2C())
     {
         Serial.println("Error MCP23017");
+        pixels.setPixelColor(0, pixels.Color(255, 0, 0));
+        pixels.setPixelColor(1, pixels.Color(255, 0, 0));
+        pixels.setPixelColor(2, pixels.Color(255, 0, 0));
+        pixels.setPixelColor(3, pixels.Color(255, 0, 0));
+        pixels.show();
         while (1)
             ;
     }
     else
     {
         Serial.println("MCP23017 ok");
+        pixels.setPixelColor(0, pixels.Color(0, 255, 0));
+        pixels.setPixelColor(1, pixels.Color(0, 255, 0));
+        pixels.setPixelColor(2, pixels.Color(0, 255, 0));
+        pixels.setPixelColor(3, pixels.Color(0, 255, 0));
+        pixels.show();
+      //  delay(200);
         pinMode(MCP_INT_PIN, INPUT);
         mcp.setupInterrupts(true, false, LOW);
     }
-#endif
-
-#ifdef WITH_RGB_LED
-    pixels.begin();
-    pixels.show();
 #endif
 
 #ifdef WITH_BUTTONS
@@ -118,10 +138,10 @@ void setupPreferences()
 
 #ifdef WITH_RGB_LED
     pixels.setBrightness(preferences.getUInt("ledBrightness", 128));
-    pixels.setPixelColor(0, pixels.Color(255, 0, 0));
-    pixels.setPixelColor(1, pixels.Color(0, 255, 0));
-    pixels.setPixelColor(2, pixels.Color(0, 0, 255));
-    pixels.setPixelColor(3, pixels.Color(255, 255, 255));
+    pixels.setPixelColor(3, pixels.Color(255, 0, 0));
+    pixels.setPixelColor(2, pixels.Color(0, 255, 0));
+    pixels.setPixelColor(1, pixels.Color(0, 0, 255));
+    pixels.setPixelColor(0, pixels.Color(255, 255, 255));
     pixels.show();
 #endif
 
@@ -141,7 +161,9 @@ uint getCurrentScreen()
 
 void setCurrentScreen(uint screen)
 {
-    preferences.putUInt("currentScreen", screen);
+    if (screen != SCREEN_CUSTOM) {
+        preferences.putUInt("currentScreen", screen);
+    }
 
     currentScreen = screen;
     handleScreenTasks(screen);
@@ -247,6 +269,30 @@ void previousScreen()
         key = "screen" + String(newCurrentScreen) + "Visible";
     }
     setCurrentScreen(newCurrentScreen);
+}
+
+void showNetworkSettings()
+{
+    std::array<String, 7> epdContent = { "", "", "", "", "", "", ""};
+    
+    String ipAddr = WiFi.localIP().toString();
+    String subNet = WiFi.subnetMask().toString();
+
+    epdContent[1] = "IP/Subnet";
+
+    int ipAddrPos = 0;
+    int subnetPos = 0;
+    for (int i = 0; i < 4; i++) {
+        epdContent[2 + i] = ipAddr.substring(0, ipAddr.indexOf('.')) + "/" +  subNet.substring(0, subNet.indexOf('.'));
+        ipAddrPos =  ipAddr.indexOf('.') + 1;
+        subnetPos = subNet.indexOf('.') + 1;
+        ipAddr = ipAddr.substring(ipAddrPos);
+        subNet = subNet.substring(subnetPos);
+    }
+
+    CustomTextScreen::setText(epdContent);
+
+    setCurrentScreen(SCREEN_CUSTOM);
 }
 
 void setLights(int r, int g, int b)

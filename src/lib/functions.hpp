@@ -23,6 +23,7 @@ void onI2CRequest();
 uint getCurrentScreen();
 void setCurrentScreen(uint screen);
 void handleScreenTasks(uint screen);
+void showNetworkSettings();
 
 void timebasedChangeTask(void *parameter);
 

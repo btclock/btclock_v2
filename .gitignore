@@ -8,3 +8,4 @@ data/.yarn
 data/node_modules
 src/config.h
 .vscode/c_cpp_properties.json
+node_modules

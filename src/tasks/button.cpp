@@ -30,6 +30,10 @@ void buttonTask(void *parameter)
             {
                 previousScreen();
             }
+            else if (pin == 0)
+            {
+                showNetworkSettings();
+            }
 
             vTaskDelay(250); // debounce
             mcp.clearInterrupts(); // clear
