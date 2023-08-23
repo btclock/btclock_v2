@@ -41,7 +41,7 @@ void checkBitcoinBlock(void *pvParameters)
             http.addHeader("Authorization", "Basic " + authEncoded);
 
             int httpCode = http.POST(payload);
-            if (httpCode > 0)
+            if (httpCode > 0 || httpCode != HTTP_CODE_UNAUTHORIZED)
             {
                 String response = http.getString();
                 deserializeJson(jsonDoc, response);
