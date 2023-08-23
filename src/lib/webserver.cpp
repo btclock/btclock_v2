@@ -154,6 +154,13 @@ void onApiSettingsGet(AsyncWebServerRequest *request)
 #endif
     root["ledFlashOnUpdate"] = preferences.getBool("ledFlashOnUpd", false);
     root["ledBrightness"] = preferences.getUInt("ledBrightness", 128);
+
+    #ifdef GIT_REV
+    root["gitRev"] = String(GIT_REV);
+    #endif
+    #ifdef LAST_BUILD_TIME
+    root["lastBuildTime"] = String(LAST_BUILD_TIME);
+    #endif
     JsonArray screens = root.createNestedArray("screens");
 
     for (int i = 0; i < screenNameMap.size(); i++)

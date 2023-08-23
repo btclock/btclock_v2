@@ -53,6 +53,12 @@ fetch('/api/settings', {
         document.getElementById('timePerScreen').value = jsonData.timerSeconds / 60;
         document.getElementById('ledBrightness').value = jsonData.ledBrightness;
 
+        if (jsonData.gitRev)
+            document.getElementById('gitRev').innerHTML = "Version: " + jsonData.gitRev;
+
+        if (jsonData.lastBuildTime)
+            document.getElementById('lastBuildTime').innerHTML = " / " + new Date((jsonData.lastBuildTime* 1000)).toLocaleString();
+
         var source = document.getElementById("screens-template").innerHTML;
         var template = Handlebars.compile(source);
         var context = { screens: jsonData.screens };

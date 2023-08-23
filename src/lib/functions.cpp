@@ -28,6 +28,8 @@ Adafruit_NeoPixel pixels(NEOPIXEL_COUNT, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
 String softAP_SSID;
 String softAP_password;
+WiFiMulti wifiMulti;
+
 WiFiManager wm;
 bool screenVisible[5];
 
@@ -42,7 +44,6 @@ void setupSoftAP()
 
 void setupComponents()
 {
-
 #ifdef WITH_RGB_LED
     pixels.begin();
     pixels.setPixelColor(0, pixels.Color(255, 0, 0));
@@ -52,8 +53,8 @@ void setupComponents()
     pixels.show();
 #endif
 
-//delay(3000);
-//Serial.println("Leds should be on");
+    // delay(3000);
+    // Serial.println("Leds should be on");
 
 #ifndef NO_MCP
     if (!mcp.begin_I2C())
@@ -75,7 +76,7 @@ void setupComponents()
         pixels.setPixelColor(2, pixels.Color(0, 255, 0));
         pixels.setPixelColor(3, pixels.Color(0, 255, 0));
         pixels.show();
-      //  delay(200);
+        //  delay(200);
         pinMode(MCP_INT_PIN, INPUT);
         mcp.setupInterrupts(true, false, LOW);
     }
@@ -108,7 +109,35 @@ void synchronizeTime()
 
 void setupWifi()
 {
+#ifndef NO_MCP
+    if (mcp.digitalRead(3) == LOW)
+    {
+        pixels.setPixelColor(0, pixels.Color(0, 0, 255));
+        pixels.setPixelColor(1, pixels.Color(0, 0, 255));
+        pixels.setPixelColor(2, pixels.Color(0, 0, 255));
+        pixels.setPixelColor(3, pixels.Color(0, 0, 255));
+        pixels.show();
+
+        delay(1500);
+
+        if (mcp.digitalRead(3) == LOW)
+        {
+            pixels.setPixelColor(0, pixels.Color(255, 0, 0));
+            pixels.setPixelColor(1, pixels.Color(0, 0, 255));
+            pixels.setPixelColor(2, pixels.Color(255, 0, 0));
+            pixels.setPixelColor(3, pixels.Color(0, 0, 255));
+            pixels.show();
+            Serial.println("Erasing WiFi Config, restarting");
+            wm.resetSettings();
+            ESP.restart();
+        }
+
+         return;
+    }
+#endif
+
     setupSoftAP();
+
     wm.setAPCallback([&](WiFiManager *wifiManager)
                      {
     showSetupQr(softAP_SSID, softAP_password); 
@@ -161,7 +190,8 @@ uint getCurrentScreen()
 
 void setCurrentScreen(uint screen)
 {
-    if (screen != SCREEN_CUSTOM) {
+    if (screen != SCREEN_CUSTOM)
+    {
         preferences.putUInt("currentScreen", screen);
     }
 
@@ -273,8 +303,8 @@ void previousScreen()
 
 void showNetworkSettings()
 {
-    std::array<String, 7> epdContent = { "", "", "", "", "", "", ""};
-    
+    std::array<String, 7> epdContent = {"", "", "", "", "", "", ""};
+
     String ipAddr = WiFi.localIP().toString();
     String subNet = WiFi.subnetMask().toString();
 
@@ -282,9 +312,10 @@ void showNetworkSettings()
 
     int ipAddrPos = 0;
     int subnetPos = 0;
-    for (int i = 0; i < 4; i++) {
-        epdContent[2 + i] = ipAddr.substring(0, ipAddr.indexOf('.')) + "/" +  subNet.substring(0, subNet.indexOf('.'));
-        ipAddrPos =  ipAddr.indexOf('.') + 1;
+    for (int i = 0; i < 4; i++)
+    {
+        epdContent[2 + i] = ipAddr.substring(0, ipAddr.indexOf('.')) + "/" + subNet.substring(0, subNet.indexOf('.'));
+        ipAddrPos = ipAddr.indexOf('.') + 1;
         subnetPos = subNet.indexOf('.') + 1;
         ipAddr = ipAddr.substring(ipAddrPos);
         subNet = subNet.substring(subnetPos);

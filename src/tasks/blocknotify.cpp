@@ -18,6 +18,7 @@ bool useBitcoind = true;
 void checkBitcoinBlock(void *pvParameters)
 {
     int blockHeight = preferences.getUInt("blockHeight", currentBlockHeight);
+ 
     HTTPClient http;
     http.setReuse(true);
     useBitcoind = wifiClientInsecure.connect(preferences.getString("rpcHost", BITCOIND_HOST).c_str(), preferences.getUInt("rpcPort", BITCOIND_PORT));
@@ -103,7 +104,8 @@ void setupBlockNotify()
 {
     // bitcoinQueue = xQueueCreate(10, sizeof(BitcoinEvent) * 2);
 
-    if (blockNotifyTaskHandle == nullptr) {
+    if (blockNotifyTaskHandle == nullptr)
+    {
         xTaskCreate(checkBitcoinBlock, "checkBitcoinBlock", 4096, NULL, 1, &blockNotifyTaskHandle);
         vTaskSuspend(blockNotifyTaskHandle);
     }

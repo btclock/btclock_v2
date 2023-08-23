@@ -141,7 +141,7 @@ void initDisplays()
         int *taskParam = new int;
         *taskParam = i;
 
-        xTaskCreate(updateDisplay, "EpdUpd" + char(i), 2048, taskParam, 1, &tasks[i]); // create task
+        xTaskCreate(updateDisplay, "EpdUpd" + char(i), 4096, taskParam, 1, &tasks[i]); // create task
                                                                                        //  delay(1000);
     }
     epdContent = {"B", "T", "C", "L", "O", "C", "K"};
