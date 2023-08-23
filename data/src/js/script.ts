@@ -80,8 +80,14 @@ settingsForm.onsubmit = (event) => {
             method: "post"
         }).then(() => {
             console.log('Submitted');
+            document.getElementById('saveSettingsBtn')?.classList.add('btn-success');
         });
 
+    return false;
+}
+
+document.getElementById('restartBtn').onclick = (event) => {
+    fetch('/api/restart');
     return false;
 }
 

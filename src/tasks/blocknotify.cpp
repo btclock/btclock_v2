@@ -35,6 +35,8 @@ void checkBitcoinBlock(void *pvParameters)
 
             http.begin(preferences.getString("rpcHost", BITCOIND_HOST).c_str(), preferences.getUInt("rpcPort", BITCOIND_PORT));
             http.addHeader("Content-Type", "application/json");
+            http.addHeader("User-Agent", "BTClock/1.0");
+
             String payload = "{\"jsonrpc\":\"1.0\",\"id\":\"current_block_height\",\"method\":\"getblockcount\",\"params\":[]}";
             String auth = preferences.getString("rpcUser", BITCOIND_RPC_USER) + ":" + preferences.getString("rpcPass", BITCOIND_RPC_PASS);
             String authEncoded = base64::encode(auth);
@@ -57,6 +59,7 @@ void checkBitcoinBlock(void *pvParameters)
         else
         {
             http.begin("https://mempool.bitcoin.nl/api/blocks/tip/height");
+            http.addHeader("User-Agent", "BTClock/1.0");
             int httpCode = http.GET();
 
             if (httpCode > 0 && httpCode == HTTP_CODE_OK)

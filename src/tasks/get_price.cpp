@@ -18,6 +18,8 @@ void taskGetPrice(void *pvParameters)
     {
         // Send HTTP request to CoinDesk API
         http.begin(apiUrl);
+        http.addHeader("User-Agent", "BTClock/1.0");
+
         int httpCode = http.GET();
 
         // Parse JSON response and extract average price
