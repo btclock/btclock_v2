@@ -44,3 +44,5 @@ jobs:
           tag: main
           commit: main
           artifacts: ".pio/build/esp32wemos-s3-mini_BW/*.bin"
+          allowUpdates: true
+          removeArtifacts: true
