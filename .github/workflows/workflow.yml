@@ -1,0 +1,32 @@
+name: PlatformIO CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+           cache: yarn
+           cache-dependency-path: '**/package-lock.json'
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.platformio/.cache
+          key: ${{ runner.os }}-pio
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install PlatformIO Core
+        run: pip install --upgrade platformio
+
+      - name: Build BTClock firmare
+        run: pio run -e esp32wemos-s3-mini_BW 
+
+      - name: Build BTClock filesystem
+        run: pio run -e esp32wemos-s3-mini_BW --target buildfs
