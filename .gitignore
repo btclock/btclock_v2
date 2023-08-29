@@ -8,3 +8,5 @@ data/.yarn
 data/node_modules
 .vscode/c_cpp_properties.json
 node_modules
+.DS_Store
+*.bin

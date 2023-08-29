@@ -32,17 +32,25 @@ jobs:
 
       - name: Build BTClock filesystem
         run: pio run -e esp32wemos-s3-mini_BW --target buildfs
+
+      - name: Install esptools.py
+        run: pip install --upgrade esptool
+
+      - name: Create merged firmware binary
+        run: esptool.py --chip esp32s3 merge_bin -o full-firmware.bin --flash_mode dio 0x0000 .pio/build/esp32wemos-s3-mini_BW/bootloader.bin 0x8000 .pio/build/esp32wemos-s3-mini_BW/partitions.bin 0xe000 ~/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin 0x10000 .pio/build/esp32wemos-s3-mini_BW/firmware.bin 0x330000 .pio/build/esp32wemos-s3-mini_BW/spiffs.bin
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           path: |
             .pio/build/esp32wemos-s3-mini_BW/*.bin
+            full-firmware.bin
 
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
           tag: main
           commit: main
-          artifacts: ".pio/build/esp32wemos-s3-mini_BW/*.bin"
+          artifacts: "full-firmware.bin,.pio/build/esp32wemos-s3-mini_BW/*.bin"
           allowUpdates: true
           removeArtifacts: true
