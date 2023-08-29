@@ -43,4 +43,4 @@ jobs:
         with:
           tag: main
           commit: main
-          artifacts: "*.bin"
+          artifacts: ".pio/build/esp32wemos-s3-mini_BW/*.bin"
