@@ -25,6 +25,7 @@ uint getCurrentScreen();
 void setCurrentScreen(uint screen);
 void handleScreenTasks(uint screen);
 void showNetworkSettings();
+void toggleScreenTimer();
 
 void timebasedChangeTask(void *parameter);
 

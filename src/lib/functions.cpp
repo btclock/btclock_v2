@@ -37,9 +37,9 @@ void setupSoftAP()
 {
     byte mac[6];
     WiFi.macAddress(mac);
-    softAP_SSID = String("BTClock" + String(mac[3], 16) + String(mac[1], 16));
+    softAP_SSID = String("BTClock" + String(mac[5], 16) + String(mac[6], 16));
     WiFi.setHostname(softAP_SSID.c_str());
-    softAP_password = base64::encode(String(mac[2], 16) + String(mac[4], 16) + String(mac[5], 16) + String(mac[6], 16)).substring(2, 12);
+    softAP_password = base64::encode(String(mac[2], 16) + String(mac[4], 16) + String(mac[5], 16) + String(mac[6], 16)).substring(2, 10);
 }
 
 void setupComponents()
@@ -132,7 +132,7 @@ void setupWifi()
             ESP.restart();
         }
 
-         return;
+        return;
     }
 #endif
 
@@ -234,6 +234,67 @@ void handleScreenTasks(uint screen)
             vTaskResume(minuteTaskHandle);
         }
         break;
+    }
+}
+
+void toggleScreenTimer()
+{
+    timerRunning = !timerRunning;
+
+    if (!timerRunning)
+    {
+        Serial.println("Stopping screen timer...");
+        for (int i = NEOPIXEL_COUNT; i >= 0; i--)
+        {
+            for (int j = NEOPIXEL_COUNT; j >= 0; j--)
+            {
+                uint32_t c = pixels.Color(0, 0, 0);
+                if (i == j)
+                    c = pixels.Color(0, 255, 0);
+                pixels.setPixelColor(j, c);
+            }
+
+            pixels.show();
+
+            delay(100);
+        }
+
+        delay(900);
+
+        pixels.clear();
+        pixels.show();
+    }
+    else
+    {
+        Serial.println("Starting screen timer...");
+
+        pixels.setPixelColor(3, pixels.Color(0, 255, 0));
+        pixels.setPixelColor(2, pixels.Color(0, 0, 0));
+        pixels.setPixelColor(1, pixels.Color(0, 0, 0));
+        pixels.setPixelColor(0, pixels.Color(0, 0, 0));
+        pixels.show();
+
+        delay(1000);
+
+        for (int i = NEOPIXEL_COUNT; i--; i > 0)
+        {
+
+            for (int j = NEOPIXEL_COUNT; j--; j > 0)
+            {
+                uint32_t c = pixels.Color(0, 0, 0);
+                if (i == j)
+                    c = pixels.Color(0, 255, 0);
+
+                pixels.setPixelColor(j, c);
+            }
+
+            pixels.show();
+
+            delay(100);
+        }
+
+        pixels.clear();
+        pixels.show();
     }
 }
 

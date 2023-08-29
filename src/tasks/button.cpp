@@ -20,15 +20,16 @@ void buttonTask(void *parameter)
         {
             uint pin = mcp.getLastInterruptPin();
             if (pin == 3) {
-                xTaskCreate(fullRefresh, "FullRefresh", 2048, NULL, 1, NULL); 
+              //  xTaskCreate(fullRefresh, "FullRefresh", 2048, NULL, 1, NULL); 
+              toggleScreenTimer();
             }
             else if (pin == 1)
             {
-                nextScreen();
+                previousScreen();
             }
             else if (pin == 2)
             {
-                previousScreen();
+                nextScreen();
             }
             else if (pin == 0)
             {

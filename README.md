@@ -5,6 +5,15 @@
 Improved code for BTClock with many features.
 Don't forget to copy `config.h.example` to `config.h`. Not necessary to adapt it, since everything should be configurable through the WebUI.
 
+### Button actions
+
+(Top = 1 to bottom = 4)
+
+1. Start/stop timer (confirmed with LEDs)
+2. Next screen
+3. Previous screen
+4. Show IP address
+
 ## Software
 
 - [PlatformIO](https://platformio.org/platformio-ide).
