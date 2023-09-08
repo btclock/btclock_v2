@@ -9,6 +9,9 @@ void setupWebserver()
     // Initialize SPIFFS
     if (!SPIFFS.begin(true))
     {
+        pinMode(47, OUTPUT);
+        digitalWrite(47, HIGH);
+
         Serial.println("An Error has occurred while mounting SPIFFS");
         return;
     }
@@ -142,7 +145,7 @@ void onApiSettingsGet(AsyncWebServerRequest *request)
     root["bgColor"] = getBgColor();
     root["timerSeconds"] = timerSeconds;
     root["timerRunning"] = timerRunning;
-    root["tzOffset"] = preferences.getUInt("gmtOffset", TIME_OFFSET_SECONDS) / 60;
+    root["tzOffset"] = preferences.getInt("gmtOffset", TIME_OFFSET_SECONDS) / 60;
     root["useBitcoinNode"] = preferences.getBool("useNode", false);
     root["rpcPort"] = preferences.getUInt("rpcPort", BITCOIND_PORT);
     root["rpcUser"] = preferences.getString("rpcUser", BITCOIND_RPC_USER);
@@ -245,7 +248,9 @@ void onApiSettingsPost(AsyncWebServerRequest *request)
     {
         AsyncWebParameter *p = request->getParam("tzOffset", true);
         int tzOffsetSeconds = p->value().toInt() * 60;
-        preferences.putUInt("tzOffset", tzOffsetSeconds);
+        preferences.putInt("gmtOffset", tzOffsetSeconds);
+        Serial.print("Setting tz offset to ");
+        Serial.println(tzOffsetSeconds);
         settingsChanged = true;
     }
 

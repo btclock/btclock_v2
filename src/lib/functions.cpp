@@ -93,12 +93,12 @@ void setupComponents()
 
 void synchronizeTime()
 {
-    configTime(preferences.getUInt("gmtOffset", TIME_OFFSET_SECONDS), 0, NTP_SERVER);
+    configTime(preferences.getInt("gmtOffset", TIME_OFFSET_SECONDS), 0, NTP_SERVER);
     struct tm timeinfo;
 
     while (!getLocalTime(&timeinfo))
     {
-        configTime(preferences.getUInt("gmtOffset", TIME_OFFSET_SECONDS), 0, NTP_SERVER);
+        configTime(preferences.getInt("gmtOffset", TIME_OFFSET_SECONDS), 0, NTP_SERVER);
         delay(500);
         Serial.println("Retry set time");
     }
