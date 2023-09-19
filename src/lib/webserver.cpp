@@ -279,6 +279,9 @@ void onApiSettingsPost(AsyncWebServerRequest *request)
                 preferences.putString(v.c_str(), pv->value().c_str());
             }
         }
+    } else {
+        preferences.putBool("useNode", false);
+        settingsChanged = true;
     }
 
     request->send(200);
