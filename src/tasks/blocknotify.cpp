@@ -21,7 +21,7 @@ void checkBitcoinBlock(void *pvParameters)
  
     HTTPClient http;
     http.setReuse(true);
-    useBitcoind = wifiClientInsecure.connect(preferences.getString("rpcHost", BITCOIND_HOST).c_str(), preferences.getUInt("rpcPort", BITCOIND_PORT));
+    useBitcoind = preferences.getBool("useNode", false) && wifiClientInsecure.connect(preferences.getString("rpcHost", BITCOIND_HOST).c_str(), preferences.getUInt("rpcPort", BITCOIND_PORT));
     if (useBitcoind)
         Serial.println("bitcoind node is reachable, using this for blocks.");
     else
