@@ -276,7 +276,10 @@ void onApiSettingsPost(AsyncWebServerRequest *request)
             if (request->hasParam(v, true))
             {
                 AsyncWebParameter *pv = request->getParam(v, true);
-                preferences.putString(v.c_str(), pv->value().c_str());
+                // Don't store an empty password, probably new settings save
+                if (!(v.equals("rpcPass") && pv->value().length() == 0)) {
+                    preferences.putString(v.c_str(), pv->value().c_str());
+                }
             }
         }
     } else {
