@@ -399,6 +399,43 @@ void setLights(int r, int g, int b)
 #endif
 }
 
+void flashTemporaryLights(int r, int g, int b)
+{
+    #ifdef WITH_RGB_LED
+
+    uint32_t oldLights[NEOPIXEL_COUNT];
+
+    // get current state
+    for (int i = 0; i < NEOPIXEL_COUNT; i++)
+    {
+        oldLights[i] = pixels.getPixelColor(i);
+    }
+
+    // flash three times in given color
+    for (int t = 0; t < 3; t++) {
+        for (int i = 0; i < NEOPIXEL_COUNT; i++)
+        {
+            pixels.setPixelColor(i, pixels.Color(r, g, b));
+        }
+
+        pixels.show();
+        delay(200);
+
+        pixels.clear();
+        pixels.show();
+        delay(200);
+    }
+
+    // revert to previous state
+    for (int i = 0; i < NEOPIXEL_COUNT; i++)
+    {
+        pixels.setPixelColor(i, oldLights[i]);
+    }
+
+    pixels.show();
+    #endif
+}
+
 void setupI2C()
 {
     bool slaveMode = preferences.getBool("I2CSlaveMode", false);

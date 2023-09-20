@@ -17,6 +17,7 @@ void setupWifi();
 void synchronizeTime();
 void setupPreferences();
 void setLights(int r, int g, int b);
+void flashTemporaryLights(int r, int g, int b);
 void setupI2C();
 void onI2CReceive(int len);
 void onI2CRequest();

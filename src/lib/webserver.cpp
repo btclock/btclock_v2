@@ -287,6 +287,8 @@ void onApiSettingsPost(AsyncWebServerRequest *request)
     request->send(200);
     if (settingsChanged)
     {
+        flashTemporaryLights(0,255,0);
+
         Serial.println("Settings changed");
     }
 }
