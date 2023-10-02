@@ -138,6 +138,7 @@ void setupWifi()
 
     setupSoftAP();
 
+    wm.setConfigPortalTimeout(180);
     wm.setAPCallback([&](WiFiManager *wifiManager)
                      {
     showSetupQr(softAP_SSID, softAP_password); 

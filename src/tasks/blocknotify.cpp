@@ -109,7 +109,7 @@ void setupBlockNotify()
 
     if (blockNotifyTaskHandle == nullptr)
     {
-        xTaskCreate(checkBitcoinBlock, "checkBitcoinBlock", 4096, NULL, 1, &blockNotifyTaskHandle);
+        xTaskCreate(checkBitcoinBlock, "checkBitcoinBlock", 8192, NULL, 1, &blockNotifyTaskHandle);
         vTaskSuspend(blockNotifyTaskHandle);
     }
     //  xTaskCreate(bitcoinEventHandler, "bitcoinEventHandler", 10000, NULL, 110, NULL);
