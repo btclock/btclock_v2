@@ -10,7 +10,10 @@ getBcStatus = () => {
         .then(jsonData => {
             var source = document.getElementById("entry-template").innerHTML;
             var template = Handlebars.compile(source);
-            var context = { currentScreen: jsonData.currentScreen, rendered: jsonData.rendered, data: jsonData.data, screens: screens, ledStatus: jsonData.ledStatus ? jsonData.ledStatus.map((t) => (t).toString(16)) : [] };
+
+            var context = { timerRunning: jsonData.timerRunning, currentScreen: jsonData.currentScreen, rendered: jsonData.rendered, data: jsonData.data, screens: screens, ledStatus: jsonData.ledStatus ? jsonData.ledStatus.map((t) => (t).toString(16)) : [] };
+
+
             document.getElementById('output').innerHTML = template(context);
         })
         .catch(err => {
@@ -54,7 +57,7 @@ fetch('/api/settings', {
         document.getElementById('ledBrightness').value = jsonData.ledBrightness;
         document.getElementById('fullRefreshMin').value = jsonData.fullRefreshMin;
         document.getElementById('wpTimeout').value = jsonData.wpTimeout;
-
+        document.getElementById('mempoolInstance').value = jsonData.mempoolInstance;
 
         if (jsonData.gitRev)
             document.getElementById('gitRev').innerHTML = "Version: " + jsonData.gitRev;
@@ -143,4 +146,12 @@ changeScreen = (id) => {
         .catch(err => {
             //error block
         });
+}
+
+toggleTimer = (currentStatus) => {
+    if (currentStatus) {
+        fetch('/api/action/pause');
+    } else {
+        fetch('/api/action/timer_restart');
+    }
 }

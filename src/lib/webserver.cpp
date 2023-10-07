@@ -154,6 +154,8 @@ void onApiSettingsGet(AsyncWebServerRequest *request)
     root["rpcPort"] = preferences.getUInt("rpcPort", BITCOIND_PORT);
     root["rpcUser"] = preferences.getString("rpcUser", BITCOIND_RPC_USER);
     root["rpcHost"] = preferences.getString("rpcHost", BITCOIND_HOST);
+    root["mempoolInstance"] = preferences.getString("mempoolInstance", DEFAULT_MEMPOOL_INSTANCE);
+
 #ifdef IS_BW
     root["epdColors"] = 2;
 #else
@@ -219,6 +221,16 @@ void onApiSettingsPost(AsyncWebServerRequest *request)
     {
         preferences.putBool("ledFlashOnUpd", 0);
         Serial.print("Setting led flash on update to false");
+        settingsChanged = true;
+    }
+
+    if (request->hasParam("mempoolInstance", true))
+    {
+        AsyncWebParameter *mempoolInstance = request->getParam("mempoolInstance", true);
+
+        preferences.putString("mempoolInstance", mempoolInstance->value().c_str());
+        Serial.print("Setting mempool instance to ");
+        Serial.println(mempoolInstance->value().c_str());
         settingsChanged = true;
     }
 

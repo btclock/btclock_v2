@@ -20,7 +20,6 @@ void checkBitcoinBlock(void *pvParameters)
     int blockHeight = preferences.getUInt("blockHeight", currentBlockHeight);
  
     HTTPClient http;
-    http.setReuse(true);
     useBitcoind = preferences.getBool("useNode", false) && wifiClientInsecure.connect(preferences.getString("rpcHost", BITCOIND_HOST).c_str(), preferences.getUInt("rpcPort", BITCOIND_PORT));
     if (useBitcoind)
         Serial.println("bitcoind node is reachable, using this for blocks.");
@@ -58,7 +57,7 @@ void checkBitcoinBlock(void *pvParameters)
         }
         else
         {
-            http.begin("https://mempool.bitcoin.nl/api/blocks/tip/height");
+            http.begin("https://" + preferences.getString("mempoolInstance", DEFAULT_MEMPOOL_INSTANCE) + "/api/blocks/tip/height");
             http.addHeader("User-Agent", "BTClock/1.0");
             int httpCode = http.GET();
 

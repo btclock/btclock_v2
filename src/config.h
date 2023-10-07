@@ -1,6 +1,7 @@
 #pragma once
 
-#define NTP_SERVER "nl.pool.ntp.org"
+#define NTP_SERVER "pool.ntp.org"
+#define DEFAULT_MEMPOOL_INSTANCE "mempool.bitcoin.nl"
 
 #define FONT_SMALL Antonio_SemiBold20pt7b
 #define FONT_BIG Antonio_SemiBold90pt7b
