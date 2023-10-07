@@ -23,8 +23,8 @@ void HalvingCountdownScreen::showScreen()
     int mins = floor(minutesToHalving - (years * 525600) - (days * (24*60)) - (hours * 60));
 //    int secs = floor((minutesToHalving - (years * 525600) - (days * (24*60)) - (hours * 60) - mins) * 60);
 
-    epdContent[0] = "BIT/HALV";
-    epdContent[1] = "COIN/ING";
+    epdContent[0] = "BIT/COIN";
+    epdContent[1] = "HALV/ING";
     epdContent[2] = String(years) + "/YRS";
     epdContent[3] = String(days) + "/DAYS";
     epdContent[4] = String(hours) + "/HRS";
