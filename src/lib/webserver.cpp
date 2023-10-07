@@ -73,6 +73,8 @@ void onApiStatus(AsyncWebServerRequest *request)
 
     DynamicJsonDocument root(1024);
     root["currentScreen"] = String(getCurrentScreen());
+    root["timerRunning"] = timerRunning;
+
     JsonArray data = root.createNestedArray("data");
     JsonArray rendered = root.createNestedArray("rendered");
     String epdContent[7];

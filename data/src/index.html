@@ -44,7 +44,19 @@
             {{#each ledStatus }}
               <div style="background: #{{ this }}">&nbsp;</div>
             {{/each}}
+            
             {{/if}}
+            <div>
+              <p>Screen cycle: 
+                <span onclick="toggleTimer({{ timerRunning }})" id="toggleTimerArea">
+                {{#if timerRunning}}
+                &#9205;
+                {{else}}
+                &#9208;
+                {{/if}}
+                </span>
+              </p>
+            </div>
           </div>
         </div>
       </script>
@@ -146,7 +158,8 @@
             <div class="row">
               <label class="col-sm-6 col-form-label" for="ledBrightness">LED brightness</label>
               <div class="col-sm-6">
-                  <input type="range" class="form-range" id="ledBrightness" name="ledBrightness" value="128" min="0" max="255">
+                <input type="range" class="form-range" id="ledBrightness" name="ledBrightness" value="128" min="0"
+                  max="255">
               </div>
             </div>
             <div class="row">
@@ -215,7 +228,7 @@
   <footer>
     <small>
       <span id="gitRev"></span>
-      <span id="lastBuildTime"></span>  
+      <span id="lastBuildTime"></span>
     </small>
   </footer>
   <script src="/js/script.js"></script>
