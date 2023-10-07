@@ -43,8 +43,8 @@ fetch('/api/settings', {
 
         if (jsonData.useBitcoinNode)
             document.getElementById('useBitcoinNode').checked = true;
-        
-        let nodeFields = ["rpcHost", "rpcPort", "rpcUser", "tzOffset"]; 
+
+        let nodeFields = ["rpcHost", "rpcPort", "rpcUser", "tzOffset"];
 
         for (let n of nodeFields) {
             document.getElementById(n).value = jsonData[n];
@@ -52,12 +52,15 @@ fetch('/api/settings', {
 
         document.getElementById('timePerScreen').value = jsonData.timerSeconds / 60;
         document.getElementById('ledBrightness').value = jsonData.ledBrightness;
+        document.getElementById('fullRefreshMin').value = jsonData.fullRefreshMin;
+        document.getElementById('wpTimeout').value = jsonData.wpTimeout;
+
 
         if (jsonData.gitRev)
             document.getElementById('gitRev').innerHTML = "Version: " + jsonData.gitRev;
 
         if (jsonData.lastBuildTime)
-            document.getElementById('lastBuildTime').innerHTML = " / " + new Date((jsonData.lastBuildTime* 1000)).toLocaleString();
+            document.getElementById('lastBuildTime').innerHTML = " / " + new Date((jsonData.lastBuildTime * 1000)).toLocaleString();
 
         var source = document.getElementById("screens-template").innerHTML;
         var template = Handlebars.compile(source);
@@ -114,7 +117,7 @@ let tzOffsetBtn = document.getElementById('getTzOffsetBtn');
 
 if (tzOffsetBtn)
     tzOffsetBtn.onclick = (event) => {
-        document.getElementById("tzOffset").value = new Date(new Date().getFullYear(), 0, 1).getTimezoneOffset()*-1;
+        document.getElementById("tzOffset").value = new Date(new Date().getFullYear(), 0, 1).getTimezoneOffset() * -1;
         return false;
     };
 

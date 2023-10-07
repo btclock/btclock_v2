@@ -321,7 +321,7 @@ void updateDisplay(void *pvParameters)
             bool updatePartial = true;
 
             // Full Refresh every half hour
-            if (!lastFullRefresh[epdIndex] || (millis() - lastFullRefresh[epdIndex])  > (30 * 60 * 1000))
+            if (!lastFullRefresh[epdIndex] || (millis() - lastFullRefresh[epdIndex])  > (preferences.getUInt("fullRefreshMin", 30) * 60 * 1000))
             {
                 updatePartial = false;
                 lastFullRefresh[epdIndex] = millis();

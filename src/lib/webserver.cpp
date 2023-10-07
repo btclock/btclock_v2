@@ -145,6 +145,8 @@ void onApiSettingsGet(AsyncWebServerRequest *request)
     root["bgColor"] = getBgColor();
     root["timerSeconds"] = timerSeconds;
     root["timerRunning"] = timerRunning;
+    root["fullRefreshMin"] = preferences.getUInt("fullRefreshMin", 30);
+    root["wpTimeout"] = preferences.getUInt("wpTimeout", 600);
     root["tzOffset"] = preferences.getInt("gmtOffset", TIME_OFFSET_SECONDS) / 60;
     root["useBitcoinNode"] = preferences.getBool("useNode", false);
     root["rpcPort"] = preferences.getUInt("rpcPort", BITCOIND_PORT);
@@ -225,6 +227,26 @@ void onApiSettingsPost(AsyncWebServerRequest *request)
         preferences.putUInt("ledBrightness", ledBrightness->value().toInt());
         Serial.print("Setting brightness to ");
         Serial.println(ledBrightness->value().c_str());
+        settingsChanged = true;
+    }
+
+    if (request->hasParam("fullRefreshMin", true))
+    {
+        AsyncWebParameter *fullRefreshMin = request->getParam("fullRefreshMin", true);
+
+        preferences.putUInt("fullRefreshMin", fullRefreshMin->value().toInt());
+        Serial.print("Set full refresh minutes to ");
+        Serial.println(fullRefreshMin->value().c_str());
+        settingsChanged = true;
+    }
+
+    if (request->hasParam("wpTimeout", true))
+    {
+        AsyncWebParameter *wpTimeout = request->getParam("wpTimeout", true);
+
+        preferences.putUInt("wpTimeout", wpTimeout->value().toInt());
+        Serial.print("Set WiFi portal timeout seconds to ");
+        Serial.println(wpTimeout->value().c_str());
         settingsChanged = true;
     }
 
@@ -335,6 +357,7 @@ void onApiShowText(AsyncWebServerRequest *request)
     {
         AsyncWebParameter *p = request->getParam("t");
         String t = p->value();
+        t.toUpperCase(); // This is needed as long as lowercase letters are glitchy
         CustomTextScreen::setSimpleText(t);
     }
     setCurrentScreen(SCREEN_CUSTOM);
