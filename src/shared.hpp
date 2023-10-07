@@ -41,13 +41,13 @@ extern Adafruit_NeoPixel pixels;
 #endif
 extern std::map<int, std::string> screenNameMap;
 
-const int SCREEN_BLOCK_HEIGHT = 0;
-const int SCREEN_MSCW_TIME = 1;
-const int SCREEN_BTC_TICKER = 2;
-const int SCREEN_TIME = 3;
-const int SCREEN_HALVING_COUNTDOWN = 4;
-const int SCREEN_COUNTDOWN = 98;
-const int SCREEN_CUSTOM = 99;
-const int screens[5] = { SCREEN_BLOCK_HEIGHT, SCREEN_MSCW_TIME, SCREEN_BTC_TICKER, SCREEN_TIME, SCREEN_HALVING_COUNTDOWN };
+const PROGMEM int SCREEN_BLOCK_HEIGHT = 0;
+const PROGMEM int SCREEN_MSCW_TIME = 1;
+const PROGMEM int SCREEN_BTC_TICKER = 2;
+const PROGMEM int SCREEN_TIME = 3;
+const PROGMEM int SCREEN_HALVING_COUNTDOWN = 4;
+const PROGMEM int SCREEN_COUNTDOWN = 98;
+const PROGMEM int SCREEN_CUSTOM = 99;
+const PROGMEM int screens[5] = { SCREEN_BLOCK_HEIGHT, SCREEN_MSCW_TIME, SCREEN_BTC_TICKER, SCREEN_TIME, SCREEN_HALVING_COUNTDOWN };
 
 const uint screenCount = sizeof(screens) / sizeof(int);

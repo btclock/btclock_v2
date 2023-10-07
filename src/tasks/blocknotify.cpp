@@ -37,8 +37,7 @@ void checkBitcoinBlock(void *pvParameters)
             http.addHeader("User-Agent", "BTClock/1.0");
 
             String payload = "{\"jsonrpc\":\"1.0\",\"id\":\"current_block_height\",\"method\":\"getblockcount\",\"params\":[]}";
-            String auth = preferences.getString("rpcUser", BITCOIND_RPC_USER) + ":" + preferences.getString("rpcPass", BITCOIND_RPC_PASS);
-            String authEncoded = base64::encode(auth);
+            String authEncoded = base64::encode(preferences.getString("rpcUser", BITCOIND_RPC_USER) + ":" + preferences.getString("rpcPass", BITCOIND_RPC_PASS));
             http.addHeader("Authorization", "Basic " + authEncoded);
 
             int httpCode = http.POST(payload);
@@ -68,7 +67,8 @@ void checkBitcoinBlock(void *pvParameters)
             }
             else
             {
-                Serial.println("Error in HTTP request to mempool API");
+                Serial.print(F("Error in HTTP request to mempool API: "));
+                Serial.println(http.errorToString(httpCode));
             }
 
             http.end();

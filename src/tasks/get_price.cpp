@@ -1,6 +1,6 @@
 #include "get_price.hpp"
 
-const char *apiUrl = "https://api.coindesk.com/v1/bpi/currentprice/USD.json";
+const PROGMEM char *apiUrl = "https://api.coindesk.com/v1/bpi/currentprice/USD.json";
 
 std::vector<EventCallbackWithNumber> priceEventCallbacks; // Define a vector to hold multiple event callbacks
 TaskHandle_t getPriceTaskHandle;
@@ -41,7 +41,7 @@ void taskGetPrice(void *pvParameters)
         }
         else
         {
-            Serial.print("Error retrieving BTC/USD price. HTTP status code: ");
+            Serial.print(F("Error retrieving BTC/USD price. HTTP status code: "));
             Serial.println(httpCode);
         }
 

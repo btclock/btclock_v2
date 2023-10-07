@@ -5,8 +5,8 @@ TaskHandle_t ledHandlerTaskHandle = NULL;
 
 void ledHandlerTask(void *parameter)
 {
-    int dir = 5;
-    int bright = 0;
+    const int dir = 5;
+    const int bright = 0;
     while (1)
     {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);

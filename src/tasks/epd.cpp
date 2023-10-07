@@ -217,7 +217,6 @@ void taskEpd(void *pvParameters)
         if (updatedThisCycle && preferences.getBool("ledFlashOnUpd", false))
         {
             xTaskNotifyGive(ledHandlerTaskHandle);
-            Serial.println("Flash leds");
         }
         #endif
 
