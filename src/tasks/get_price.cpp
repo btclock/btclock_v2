@@ -13,12 +13,13 @@ TaskHandle_t getPriceTaskHandle;
 
 void taskGetPrice(void *pvParameters)
 {
-    HTTPClient http;
     for (;;)
     {
+        HTTPClient http;
+        http.setUserAgent(USER_AGENT);
+
         // Send HTTP request to CoinDesk API
         http.begin(apiUrl);
-        http.addHeader("User-Agent", "BTClock/1.0");
 
         int httpCode = http.GET();
 

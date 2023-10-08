@@ -139,6 +139,7 @@ void setupWifi()
     setupSoftAP();
 
     wm.setConfigPortalTimeout(preferences.getUInt("wpTimeout", 600));
+    wm.setWiFiAutoReconnect(true);
     wm.setAPCallback([&](WiFiManager *wifiManager)
                      {
     showSetupQr(softAP_SSID, softAP_password); 

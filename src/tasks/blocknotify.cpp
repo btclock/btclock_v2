@@ -19,25 +19,28 @@ void checkBitcoinBlock(void *pvParameters)
 {
     int blockHeight = preferences.getUInt("blockHeight", currentBlockHeight);
  
-    HTTPClient http;
+  
     useBitcoind = preferences.getBool("useNode", false) && wifiClientInsecure.connect(preferences.getString("rpcHost", BITCOIND_HOST).c_str(), preferences.getUInt("rpcPort", BITCOIND_PORT));
     if (useBitcoind)
         Serial.println("bitcoind node is reachable, using this for blocks.");
     else
         Serial.println("bitcoind node is not reachable, using mempool API instead.");
 
+    
     for (;;)
     {
+        HTTPClient http;
+        http.setUserAgent(USER_AGENT);
+
         if (useBitcoind)
         {
             StaticJsonDocument<200> jsonDoc;
 
             http.begin(preferences.getString("rpcHost", BITCOIND_HOST).c_str(), preferences.getUInt("rpcPort", BITCOIND_PORT));
             http.addHeader("Content-Type", "application/json");
-            http.addHeader("User-Agent", "BTClock/1.0");
 
-            String payload = "{\"jsonrpc\":\"1.0\",\"id\":\"current_block_height\",\"method\":\"getblockcount\",\"params\":[]}";
-            String authEncoded = base64::encode(preferences.getString("rpcUser", BITCOIND_RPC_USER) + ":" + preferences.getString("rpcPass", BITCOIND_RPC_PASS));
+            const String payload = "{\"jsonrpc\":\"1.0\",\"id\":\"current_block_height\",\"method\":\"getblockcount\",\"params\":[]}";
+            const String authEncoded = base64::encode(preferences.getString("rpcUser", BITCOIND_RPC_USER) + ":" + preferences.getString("rpcPass", BITCOIND_RPC_PASS));
             http.addHeader("Authorization", "Basic " + authEncoded);
 
             int httpCode = http.POST(payload);
@@ -57,7 +60,6 @@ void checkBitcoinBlock(void *pvParameters)
         else
         {
             http.begin("https://" + preferences.getString("mempoolInstance", DEFAULT_MEMPOOL_INSTANCE) + "/api/blocks/tip/height");
-            http.addHeader("User-Agent", "BTClock/1.0");
             int httpCode = http.GET();
 
             if (httpCode > 0 && httpCode == HTTP_CODE_OK)
@@ -68,7 +70,9 @@ void checkBitcoinBlock(void *pvParameters)
             else
             {
                 Serial.print(F("Error in HTTP request to mempool API: "));
+                Serial.print(httpCode);
                 Serial.println(http.errorToString(httpCode));
+
             }
 
             http.end();
@@ -82,6 +86,7 @@ void checkBitcoinBlock(void *pvParameters)
             currentBlockHeight = blockHeight;
             preferences.putUInt("blockHeight", currentBlockHeight);
         }
+
         vTaskDelay(pdMS_TO_TICKS(BLOCKNOTIFY_WAIT_TIME)); // wait 1 minute before checking again
     }
 }

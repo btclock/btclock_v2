@@ -22,4 +22,6 @@
 #define DEFAULT_FG_COLOR GxEPD_WHITE
 #define DEFAULT_BG_COLOR GxEPD_BLACK
 
+#define USER_AGENT "BTClock/1.0"
+
 #define I2C_DEV_ADDR 0x55
