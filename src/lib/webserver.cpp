@@ -26,6 +26,7 @@ void setupWebserver()
     server.on("/api/action/update", HTTP_GET, onApiActionUpdate);
     server.on("/api/full_refresh", HTTP_GET, onApiFullRefresh);
     server.on("/api/status", HTTP_GET, onApiStatus);
+    server.on("/api/system_status", HTTP_GET, onApiSystemStatus);
 
     server.on("/api/settings", HTTP_GET, onApiSettingsGet);
     server.on("/api/settings", HTTP_POST, onApiSettingsPost);
@@ -67,6 +68,10 @@ void setupWebserver()
     Serial.println("Webserver should be running");
 }
 
+/**
+ * @Api
+ * @Path("/api/status")
+*/
 void onApiStatus(AsyncWebServerRequest *request)
 {
     AsyncResponseStream *response = request->beginResponseStream("application/json");
@@ -101,6 +106,10 @@ void onApiStatus(AsyncWebServerRequest *request)
     request->send(response);
 }
 
+/**
+ * @Api
+ * @Path("/api/action/pause")
+*/
 void onApiActionPause(AsyncWebServerRequest *request)
 {
     timerRunning = false;
@@ -109,6 +118,10 @@ void onApiActionPause(AsyncWebServerRequest *request)
     request->send(200);
 };
 
+/**
+ * @Api
+ * @Path("/api/action/full_refresh")
+*/
 void onApiFullRefresh(AsyncWebServerRequest *request)
 {
 
@@ -117,6 +130,10 @@ void onApiFullRefresh(AsyncWebServerRequest *request)
     request->send(200);
 }
 
+/**
+ * @Api
+ * @Path("/api/action/timer_restart")
+*/
 void onApiActionTimerRestart(AsyncWebServerRequest *request)
 {
     // moment = millis();
@@ -126,6 +143,11 @@ void onApiActionTimerRestart(AsyncWebServerRequest *request)
     request->send(200);
 }
 
+/**
+ * @Api
+ * @Path("/api/action/update")
+ * @Parameter int rate Time in minutes
+*/
 void onApiActionUpdate(AsyncWebServerRequest *request)
 {
     if (request->hasParam("rate"))
@@ -140,6 +162,11 @@ void onApiActionUpdate(AsyncWebServerRequest *request)
     request->send(200);
 }
 
+/**
+ * @Api
+ * @Method GET
+ * @Path("/api/settings")
+*/
 void onApiSettingsGet(AsyncWebServerRequest *request)
 {
     DynamicJsonDocument root(1024);
@@ -164,12 +191,12 @@ void onApiSettingsGet(AsyncWebServerRequest *request)
     root["ledFlashOnUpdate"] = preferences.getBool("ledFlashOnUpd", false);
     root["ledBrightness"] = preferences.getUInt("ledBrightness", 128);
 
-    #ifdef GIT_REV
+#ifdef GIT_REV
     root["gitRev"] = String(GIT_REV);
-    #endif
-    #ifdef LAST_BUILD_TIME
+#endif
+#ifdef LAST_BUILD_TIME
     root["lastBuildTime"] = String(LAST_BUILD_TIME);
-    #endif
+#endif
     JsonArray screens = root.createNestedArray("screens");
 
     for (int i = 0; i < screenNameMap.size(); i++)
@@ -186,14 +213,14 @@ void onApiSettingsGet(AsyncWebServerRequest *request)
     request->send(200, "application/json", responseText);
 }
 
-void onApiSettingsPost(AsyncWebServerRequest *request)
+bool processEpdColorSettings(AsyncWebServerRequest *request)
 {
-    int params = request->params();
     bool settingsChanged = false;
     if (request->hasParam("fgColor", true))
     {
         AsyncWebParameter *fgColor = request->getParam("fgColor", true);
         preferences.putUInt("fgColor", strtol(fgColor->value().c_str(), NULL, 16));
+        setFgColor(int(strtol(fgColor->value().c_str(), NULL, 16)));
         Serial.print("Setting foreground color to ");
         Serial.println(fgColor->value().c_str());
         settingsChanged = true;
@@ -203,10 +230,36 @@ void onApiSettingsPost(AsyncWebServerRequest *request)
         AsyncWebParameter *bgColor = request->getParam("bgColor", true);
 
         preferences.putUInt("bgColor", strtol(bgColor->value().c_str(), NULL, 16));
+        setBgColor(int(strtol(bgColor->value().c_str(), NULL, 16)));
         Serial.print("Setting background color to ");
         Serial.println(bgColor->value().c_str());
         settingsChanged = true;
     }
+
+    return settingsChanged;
+}
+
+void onApiEpdSettingsPost(AsyncWebServerRequest *request)
+{
+    bool settingsChanged = false;
+
+    settingsChanged = processEpdColorSettings(request);
+
+    request->send(200);
+    if (settingsChanged)
+    {
+        flashTemporaryLights(0, 255, 0);
+
+        Serial.println("Settings changed");
+    }
+}
+
+void onApiSettingsPost(AsyncWebServerRequest *request)
+{
+    int params = request->params();
+    bool settingsChanged = false;
+
+    settingsChanged = processEpdColorSettings(request);
 
     if (request->hasParam("ledFlashOnUpd", true))
     {
@@ -313,12 +366,15 @@ void onApiSettingsPost(AsyncWebServerRequest *request)
             {
                 AsyncWebParameter *pv = request->getParam(v, true);
                 // Don't store an empty password, probably new settings save
-                if (!(v.equals("rpcPass") && pv->value().length() == 0)) {
+                if (!(v.equals("rpcPass") && pv->value().length() == 0))
+                {
                     preferences.putString(v.c_str(), pv->value().c_str());
                 }
             }
         }
-    } else {
+    }
+    else
+    {
         preferences.putBool("useNode", false);
         settingsChanged = true;
     }
@@ -326,7 +382,7 @@ void onApiSettingsPost(AsyncWebServerRequest *request)
     request->send(200);
     if (settingsChanged)
     {
-        flashTemporaryLights(0,255,0);
+        flashTemporaryLights(0, 255, 0);
 
         Serial.println("Settings changed");
     }
@@ -452,4 +508,20 @@ void onApiLightsSetColor(AsyncWebServerRequest *request)
     sscanf(rgbColor.c_str(), "%02x%02x%02x", &r, &g, &b);
     setLights(r, g, b);
     request->send(200, "text/plain", rgbColor);
+}
+
+void onApiSystemStatus(AsyncWebServerRequest *request)
+{
+    AsyncResponseStream *response = request->beginResponseStream("application/json");
+
+    DynamicJsonDocument root(1024);
+
+    root["espFreeHeap"] = ESP.getFreeHeap();
+    root["espHeapSize"] = ESP.getHeapSize();
+    root["espFreePsram"] = ESP.getFreePsram();
+    root["espPsramSize"] = ESP.getPsramSize();
+
+    String responseText;
+    serializeJson(root, responseText);
+    request->send(200, "application/json", responseText);
 }

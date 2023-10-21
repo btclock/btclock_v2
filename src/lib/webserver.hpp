@@ -6,12 +6,15 @@
 
 #include <ESPmDNS.h>
 #include "lib/functions.hpp"
+#include "lib/epd.hpp"
+
 #include <string>
 #include "tasks/epd.hpp"
 #include "shared.hpp"
 
 void setupWebserver();
 void onApiStatus(AsyncWebServerRequest *request);
+void onApiSystemStatus(AsyncWebServerRequest *request);
 void onApiActionPause(AsyncWebServerRequest *request);
 void onApiActionTimerRestart(AsyncWebServerRequest *request);
 void onApiActionUpdate(AsyncWebServerRequest *request);

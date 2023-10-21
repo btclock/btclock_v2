@@ -11,8 +11,7 @@ const int MCP_INT_PIN = 8;
 
 #endif
 bool timerRunning = true;
-int fgColor;
-int bgColor;
+
 uint wifiConnectionLostCount = 0;
 
 #ifdef WITH_RGB_LED
@@ -157,8 +156,8 @@ void setupPreferences()
     timerSeconds = preferences.getUInt("timerSeconds", 1800);
     currentScreen = preferences.getUInt("currentScreen", 0);
     // handleScreenTasks(currentScreen);
-    fgColor = preferences.getUInt("fgColor", DEFAULT_FG_COLOR);
-    bgColor = preferences.getUInt("bgColor", DEFAULT_BG_COLOR);
+    setFgColor(preferences.getUInt("fgColor", DEFAULT_FG_COLOR));
+    setBgColor(preferences.getUInt("bgColor", DEFAULT_BG_COLOR));
     preferences.getBool("ledFlashOnUpd", false);
 
     screenNameMap = {{SCREEN_BLOCK_HEIGHT, "Block Height"},
@@ -300,15 +299,6 @@ void toggleScreenTimer()
     }
 }
 
-int getBgColor()
-{
-    return bgColor;
-}
-
-int getFgColor()
-{
-    return fgColor;
-}
 
 void timebasedChangeTask(void *parameter)
 {

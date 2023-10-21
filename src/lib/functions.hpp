@@ -7,6 +7,7 @@
 #include "config.h"
 #include "shared.hpp"
 #include "Adafruit_GFX.h"
+#include "lib/epd.hpp"
 #include "tasks/blocknotify.hpp"
 #include "tasks/minute.hpp"
 #include "tasks/get_price.hpp"
@@ -31,8 +32,6 @@ void toggleScreenTimer();
 void timebasedChangeTask(void *parameter);
 
 GFXfont getFont(uint size);
-int getBgColor();
-int getFgColor();
 
 void setupSoftAP();
 void nextScreen();
