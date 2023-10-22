@@ -39,19 +39,29 @@ jobs:
       - name: Create merged firmware binary
         run: mkdir -p output && esptool.py --chip esp32s3 merge_bin -o output/full-firmware.bin --flash_mode dio 0x0000 .pio/build/esp32wemos-s3-mini_BW/bootloader.bin 0x8000 .pio/build/esp32wemos-s3-mini_BW/partitions.bin 0xe000 ~/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin 0x10000 .pio/build/esp32wemos-s3-mini_BW/firmware.bin 0x330000 .pio/build/esp32wemos-s3-mini_BW/spiffs.bin
 
+      - name: Create checksums
+        run: shasum -a 256 output/full-firmware.bin > output/full-firmware.sha256
+
+      - name: Write commit hash to file
+        run: echo $GITHUB_SHA > output/commit.txt
+
+      - name: Write build date to file
+        run: echo "$(date +'%Y-%m-%dT%H:%M:%S')" > output/date.txt
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           path: |
             .pio/build/esp32wemos-s3-mini_BW/*.bin
             output/full-firmware.bin
+            output/full-firmware.sha256
 
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
           tag: main
           commit: main
-          artifacts: "output/full-firmware.bin,.pio/build/esp32wemos-s3-mini_BW/*.bin"
+          artifacts: "output/full-firmware.bin,output/full-firmware.sha256,.pio/build/esp32wemos-s3-mini_BW/*.bin"
           allowUpdates: true
           removeArtifacts: true
       - name: Pushes full-firmware.bin to web flasher
@@ -65,5 +75,5 @@ jobs:
           destination-github-username: 'btclock'
           destination-repository-name: 'web-flasher'
           target-branch: btclock
-          user-name: ${GITHUB_ACTOR}
-          user-email: ${GITHUB_ACTOR}@users.noreply.github.com
+          user-name: ${{GITHUB_ACTOR}}
+          user-email: ${{GITHUB_ACTOR}}@users.noreply.github.com
