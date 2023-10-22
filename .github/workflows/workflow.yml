@@ -75,5 +75,5 @@ jobs:
           destination-github-username: 'btclock'
           destination-repository-name: 'web-flasher'
           target-branch: btclock
-          user-name: ${{GITHUB_ACTOR}}
-          user-email: ${{GITHUB_ACTOR}}@users.noreply.github.com
+          user-name: ${{github.actor}}
+          user-email: ${{github.actor}}@users.noreply.github.com
