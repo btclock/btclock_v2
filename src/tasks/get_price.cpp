@@ -1,6 +1,7 @@
 #include "get_price.hpp"
 
 const PROGMEM char *apiUrl = "https://api.coindesk.com/v1/bpi/currentprice/USD.json";
+const PROGMEM char *cgApiUrl = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd%2Ceur";
 
 std::vector<EventCallbackWithNumber> priceEventCallbacks; // Define a vector to hold multiple event callbacks
 TaskHandle_t getPriceTaskHandle;
@@ -18,43 +19,78 @@ void taskGetPrice(void *pvParameters)
         HTTPClient http;
         http.setUserAgent(USER_AGENT);
 
-        // Send HTTP request to CoinDesk API
-        http.begin(apiUrl);
-
-        int httpCode = http.GET();
-
-        // Parse JSON response and extract average price
-        float usdPrice, eurPrice;
-        if (httpCode == 200)
+        if (true)
         {
-            String payload = http.getString();
-            StaticJsonDocument<768> doc;
-            deserializeJson(doc, payload);
-            JsonObject bpi = doc["bpi"];
-            usdPrice = bpi["USD"]["rate_float"];
-            eurPrice = bpi["EUR"]["rate_float"];
-            for(auto &callback : priceEventCallbacks) { // Loop through all the event callbacks and call them
-                callback(usdPrice);
+            // Send HTTP request to CoinGecko API
+            http.begin(cgApiUrl);
+
+            int httpCode = http.GET();
+
+            // Parse JSON response and extract average price
+            float usdPrice, eurPrice;
+            if (httpCode == 200)
+            {
+                String payload = http.getString();
+                StaticJsonDocument<768> doc;
+                deserializeJson(doc, payload);
+                JsonObject bpi = doc["bitcoin"];
+                usdPrice = bpi["usd"];
+                eurPrice = bpi["eur"];
+                for (auto &callback : priceEventCallbacks)
+                { // Loop through all the event callbacks and call them
+                    callback(usdPrice);
+                }
+
+                preferences.putFloat("btcPrice", usdPrice);
+                preferences.putFloat("btcPriceEur", eurPrice);
             }
+            else
+            {
+                Serial.print(F("Error retrieving BTC/USD price (CoinGecko). HTTP status code: "));
+                Serial.println(httpCode);
+            }
+        } else {
 
-            preferences.putFloat("btcPrice", usdPrice);
-            preferences.putFloat("btcPriceEur", eurPrice);
-        }
-        else
-        {
-            Serial.print(F("Error retrieving BTC/USD price. HTTP status code: "));
-            Serial.println(httpCode);
+            // Send HTTP request to CoinDesk API
+            http.begin(apiUrl);
+
+            int httpCode = http.GET();
+
+            // Parse JSON response and extract average price
+            float usdPrice, eurPrice;
+            if (httpCode == 200)
+            {
+                String payload = http.getString();
+                StaticJsonDocument<768> doc;
+                deserializeJson(doc, payload);
+                JsonObject bpi = doc["bpi"];
+                usdPrice = bpi["USD"]["rate_float"];
+                eurPrice = bpi["EUR"]["rate_float"];
+                for (auto &callback : priceEventCallbacks)
+                { // Loop through all the event callbacks and call them
+                    callback(usdPrice);
+                }
+
+                preferences.putFloat("btcPrice", usdPrice);
+                preferences.putFloat("btcPriceEur", eurPrice);
+            }
+            else
+            {
+                Serial.print(F("Error retrieving BTC/USD price (CoinDesk). HTTP status code: "));
+                Serial.println(httpCode);
+            }
         }
 
         http.end();
-        
+
         vTaskDelay(pdMS_TO_TICKS(PRICE_WAIT_TIME));
     }
 }
 
 void setupGetPriceTask()
 {
-    if (getPriceTaskHandle == nullptr) {
+    if (getPriceTaskHandle == nullptr)
+    {
         xTaskCreate(taskGetPrice, "getPrice", 8192, NULL, 1, &getPriceTaskHandle);
         vTaskSuspend(getPriceTaskHandle);
     }
@@ -62,5 +98,5 @@ void setupGetPriceTask()
 
 void registerNewPriceCallback(EventCallbackWithNumber cb)
 {
-  priceEventCallbacks.push_back(cb);
+    priceEventCallbacks.push_back(cb);
 }
