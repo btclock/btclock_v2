@@ -26,7 +26,7 @@ void onApiShowTextAdvanced(AsyncWebServerRequest *request, JsonVariant &json);
 
 void onApiFullRefresh(AsyncWebServerRequest *request);
 void onApiCountdown(AsyncWebServerRequest *request);
-void onApiWifiScan(AsyncWebServerRequest *request);
+//void onApiWifiScan(AsyncWebServerRequest *request);
 void onApiRestart(AsyncWebServerRequest *request);
 
 void onApiLightsOff(AsyncWebServerRequest *request);

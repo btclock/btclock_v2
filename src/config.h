@@ -24,4 +24,6 @@
 
 #define USER_AGENT "BTClock/1.0"
 
+#define NUM_SCREENS 7
+
 #define I2C_DEV_ADDR 0x55

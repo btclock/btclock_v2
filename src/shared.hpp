@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 //##include <Crypto.h>
-
+#include <ArduinoJson.h>
 #include <WiFi.h>
 #include <map>
 
@@ -51,3 +51,15 @@ const PROGMEM int SCREEN_CUSTOM = 99;
 const PROGMEM int screens[5] = { SCREEN_BLOCK_HEIGHT, SCREEN_MSCW_TIME, SCREEN_BTC_TICKER, SCREEN_TIME, SCREEN_HALVING_COUNTDOWN };
 
 const uint screenCount = sizeof(screens) / sizeof(int);
+
+struct SpiRamAllocator {
+        void* allocate(size_t size) {
+                return ps_malloc(size);
+
+        }
+        void deallocate(void* pointer) {
+                free(pointer);
+        }
+};
+
+using SpiRamJsonDocument = BasicJsonDocument<SpiRamAllocator>;

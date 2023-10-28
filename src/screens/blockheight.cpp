@@ -1,7 +1,10 @@
 #include "blockheight.hpp"
 
 uint BlockHeightScreen::blockNr = 0;
-std::array<String, 7> BlockHeightScreen::epdContent = { "", "", "", "", "", "", "" };
+std::array<String, NUM_SCREENS> BlockHeightScreen::epdContent = { "", "", "", "", "", "", "" };
+
+//std::array<String, NUM_SCREENS> * BlockHeightScreen::epdContent = (std::array<String, NUM_SCREENS> * ) ps_malloc(7 * sizeof (std::array<String, NUM_SCREENS>));
+
 
 void BlockHeightScreen::init()
 {
@@ -13,9 +16,9 @@ void BlockHeightScreen::init()
 void BlockHeightScreen::showScreen()
 {
     std::string blockNrString = String(BlockHeightScreen::blockNr).c_str();
-    blockNrString.insert(blockNrString.begin(), 7 - blockNrString.length(), ' ');
+    blockNrString.insert(blockNrString.begin(), NUM_SCREENS - blockNrString.length(), ' ');
     epdContent[0] = "BLOCK/HEIGHT";
-    for (uint i = 1; i < 7; i++)
+    for (uint i = 1; i < NUM_SCREENS; i++)
     {
         BlockHeightScreen::epdContent[i] = blockNrString[i];
     }

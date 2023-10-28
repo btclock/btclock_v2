@@ -3,7 +3,7 @@
 uint HalvingCountdownScreen::currentBlockNr = 0;
 uint HalvingCountdownScreen::halvingBlockNr = 0;
 
-std::array<String, 7> HalvingCountdownScreen::epdContent = {"", "", "", "", "", "", ""};
+std::array<String, NUM_SCREENS> HalvingCountdownScreen::epdContent = {"", "", "", "", "", "", ""};
 
 void HalvingCountdownScreen::init()
 {
@@ -44,7 +44,7 @@ void HalvingCountdownScreen::onNewBlock(uint blockNr)
     HalvingCountdownScreen::showScreen();
 }
 
-std::array<String, 7> HalvingCountdownScreen::getEpdContent()
+std::array<String, NUM_SCREENS> HalvingCountdownScreen::getEpdContent()
 {
     return HalvingCountdownScreen::epdContent;
 }

@@ -36,7 +36,6 @@ void setupWebserver()
     AsyncCallbackJsonWebHandler *handler = new AsyncCallbackJsonWebHandler("/api/show/custom", onApiShowTextAdvanced);
     server.addHandler(handler);
 
-    server.on("/api/wifi/scan", HTTP_GET, onApiWifiScan);
     server.on("/api/restart", HTTP_GET, onApiRestart);
 
     server.on("/api/countdown", HTTP_GET, onApiCountdown);
@@ -76,7 +75,7 @@ void onApiStatus(AsyncWebServerRequest *request)
 {
     AsyncResponseStream *response = request->beginResponseStream("application/json");
 
-    DynamicJsonDocument root(1024);
+    StaticJsonDocument<512> root;
     root["currentScreen"] = String(getCurrentScreen());
     root["timerRunning"] = timerRunning;
 
@@ -169,7 +168,7 @@ void onApiActionUpdate(AsyncWebServerRequest *request)
 */
 void onApiSettingsGet(AsyncWebServerRequest *request)
 {
-    DynamicJsonDocument root(1024);
+    StaticJsonDocument<768> root;
     root["fgColor"] = getFgColor();
     root["bgColor"] = getBgColor();
     root["timerSeconds"] = timerSeconds;
@@ -208,9 +207,10 @@ void onApiSettingsGet(AsyncWebServerRequest *request)
         o["enabled"] = preferences.getBool(key.c_str(), true);
     }
 
-    String responseText;
-    serializeJson(root, responseText);
-    request->send(200, "application/json", responseText);
+    AsyncResponseStream *response = request->beginResponseStream("application/json");
+    serializeJson(root, *response);
+    
+    request->send(response);
 }
 
 bool processEpdColorSettings(AsyncWebServerRequest *request)
@@ -440,27 +440,27 @@ void onApiRestart(AsyncWebServerRequest *request)
     esp_restart();
 }
 
-void onApiWifiScan(AsyncWebServerRequest *request)
-{
-    WiFi.scanNetworks(true);
+// void onApiWifiScan(AsyncWebServerRequest *request)
+// {
+//     WiFi.scanNetworks(true);
 
-    int n = WiFi.scanComplete();
+//     int n = WiFi.scanComplete();
 
-    DynamicJsonDocument doc(1024);
+//     DynamicJsonDocument doc(1024);
 
-    for (int i = 0; i < n; ++i)
-    {
-        JsonObject wifi = doc.createNestedObject(WiFi.BSSID(i));
-        Serial.println(WiFi.SSID(i));
-        wifi["ssid"] = WiFi.SSID(i);
-        wifi["rssi"] = WiFi.RSSI(i);
-        wifi["encryptionType"] = WiFi.encryptionType(i);
-    }
+//     for (int i = 0; i < n; ++i)
+//     {
+//         JsonObject wifi = doc.createNestedObject(WiFi.BSSID(i));
+//         Serial.println(WiFi.SSID(i));
+//         wifi["ssid"] = WiFi.SSID(i);
+//         wifi["rssi"] = WiFi.RSSI(i);
+//         wifi["encryptionType"] = WiFi.encryptionType(i);
+//     }
 
-    String responseText;
-    serializeJson(doc, responseText);
-    request->send(200, "application/json", responseText);
-}
+//     String responseText;
+//     serializeJson(doc, responseText);
+//     request->send(200, "application/json", responseText);
+// }
 
 void onApiCountdown(AsyncWebServerRequest *request)
 {
@@ -514,14 +514,14 @@ void onApiSystemStatus(AsyncWebServerRequest *request)
 {
     AsyncResponseStream *response = request->beginResponseStream("application/json");
 
-    DynamicJsonDocument root(1024);
+    StaticJsonDocument<128> root;
 
     root["espFreeHeap"] = ESP.getFreeHeap();
     root["espHeapSize"] = ESP.getHeapSize();
     root["espFreePsram"] = ESP.getFreePsram();
     root["espPsramSize"] = ESP.getPsramSize();
 
-    String responseText;
-    serializeJson(root, responseText);
-    request->send(200, "application/json", responseText);
+    serializeJson(root, *response);
+
+    request->send(response);
 }

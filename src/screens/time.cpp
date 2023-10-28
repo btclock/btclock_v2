@@ -1,8 +1,6 @@
 #include "time.hpp"
 
-String TimeScreen::timeString = "";
-String TimeScreen::dateString = "";
-std::array<String, 7> TimeScreen::epdContent = { "", "", "", "", "", "", "" };
+std::array<String, NUM_SCREENS> TimeScreen::epdContent = { "", "", "", "", "", "", "" };
 
 void TimeScreen::init() { 
     setupMinuteEvent();
@@ -10,13 +8,13 @@ void TimeScreen::init() {
 }
 
 void TimeScreen::showScreen() {
-    TimeScreen::dateString = String(rtc.getDay()) + "/" + String(rtc.getMonth() + 1);
-    TimeScreen::timeString = rtc.getTime("%H:%M").c_str();
+   // String(String(rtc.getDay()) + "/" + String(rtc.getMonth() + 1)).toCharArray(TimeScreen::dateString, 5);
+  //  rtc.getTime("%H:%M").toCharArray(TimeScreen::timeString, 5);
 
-    std::string timeString = TimeScreen::timeString.c_str();
-    timeString.insert(timeString.begin(), 7 - timeString.length(), ' ');
-    TimeScreen::epdContent[0] = TimeScreen::dateString;
-    for (uint i = 1; i < 7; i++)
+    std::string timeString = rtc.getTime("%H:%M").c_str();
+    timeString.insert(timeString.begin(), NUM_SCREENS - timeString.length(), ' ');
+    TimeScreen::epdContent[0] = String(rtc.getDay()) + "/" + String(rtc.getMonth() + 1);
+    for (uint i = 1; i < NUM_SCREENS; i++)
     {
         TimeScreen::epdContent[i] = timeString[i];
     }
@@ -30,7 +28,7 @@ void TimeScreen::onActivate() {
     TimeScreen::showScreen();
 }
 
-std::array<String, 7> TimeScreen::getEpdContent() {
+std::array<String, NUM_SCREENS> TimeScreen::getEpdContent() {
     return TimeScreen::epdContent;
 }
 

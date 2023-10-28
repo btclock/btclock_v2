@@ -6,6 +6,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include "base64.h"
+#include "lib/functions.hpp"
 
 #include "shared.hpp"
 #include "config.h"

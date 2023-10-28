@@ -2,7 +2,7 @@
 
 uint CountdownScreen::countdownMinutes = 1;
 uint CountdownScreen::countdownSeconds = 0;
-std::array<String, 7> CountdownScreen::epdContent = {"COUNT/DOWN", "", "", "", "", "", ""};
+std::array<String, NUM_SCREENS> CountdownScreen::epdContent = {"COUNT/DOWN", "", "", "", "", "", ""};
 
 void CountdownScreen::init()
 {
@@ -14,7 +14,7 @@ void CountdownScreen::showScreen()
 
 }
 
-std::array<String, 7> CountdownScreen::getEpdContent()
+std::array<String, NUM_SCREENS> CountdownScreen::getEpdContent()
 {
     return CountdownScreen::epdContent;
 }
@@ -27,10 +27,10 @@ void CountdownScreen::countdownTask(void *pvParameters)
 {
     for (int i = CountdownScreen::countdownSeconds; i >= 0; i--)
     {
-        char countdownString[7];
+        char countdownString[NUM_SCREENS];
         sprintf(countdownString, "%02d:%02d", i / 60, i % 60);
         std::string timeString = countdownString;
-        timeString.insert(timeString.begin(), 7 - timeString.length(), ' ');
+        timeString.insert(timeString.begin(), NUM_SCREENS - timeString.length(), ' ');
         CountdownScreen::epdContent[0] = "COUNT/DOWN";
         for (uint i = 1; i < 7; i++)
         {

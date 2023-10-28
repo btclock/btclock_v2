@@ -6,9 +6,9 @@
 // const int EPD_BUSY[7] = {16, 18, 37, 9, 7, 5, 3};
 // const int EPD_RESET_MPD[7] = {14, 13, 12, 11, 10, 9, 8};
 
-const int EPD_CS[7] = {2, 4, 6, 10, 33, 21, 17};
-const int EPD_BUSY[7] = {3, 5, 7, 9, 37, 18, 16};
-const int EPD_RESET_MPD[7] = {8, 9, 10, 11, 12, 13, 14};
+const int EPD_CS[NUM_SCREENS] = {2, 4, 6, 10, 33, 21, 17};
+const int EPD_BUSY[NUM_SCREENS] = {3, 5, 7, 9, 37, 18, 16};
+const int EPD_RESET_MPD[NUM_SCREENS] = {8, 9, 10, 11, 12, 13, 14};
 
 const int EPD_DC = 14;
 const int RST_PIN = 15;
@@ -45,7 +45,8 @@ const int RST_PIN = 2;
 #endif
 
 #ifdef IS_BW
-GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> displays[7] = {
+
+GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> displays[NUM_SCREENS] = {
     GxEPD2_213_B74(EPD_CS[0], EPD_DC, /*RST=*/-1, EPD_BUSY[0]),
     GxEPD2_213_B74(EPD_CS[1], EPD_DC, /*RST=*/-1, EPD_BUSY[1]),
     GxEPD2_213_B74(EPD_CS[2], EPD_DC, /*RST=*/-1, EPD_BUSY[2]),
@@ -54,6 +55,8 @@ GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> displays[7] = {
     GxEPD2_213_B74(EPD_CS[5], EPD_DC, /*RST=*/-1, EPD_BUSY[5]),
     GxEPD2_213_B74(EPD_CS[6], EPD_DC, /*RST=*/-1, EPD_BUSY[6]),
 };
+
+//GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> * displays2 = (GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> *) ps_malloc(7 * sizeof (GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT>));
 
 const int SEM_WAIT_TIME = 10000;
 
@@ -72,13 +75,12 @@ const int SEM_WAIT_TIME = 30000;
 
 #endif
 
-const uint displaySize = 7;
-uint32_t lastFullRefresh[displaySize];
+uint32_t lastFullRefresh[NUM_SCREENS];
 
 std::array<String, 7> currentEpdContent;
 std::array<String, 7> epdContent;
-TaskHandle_t tasks[displaySize];
-SemaphoreHandle_t epdUpdateSemaphore[displaySize];
+TaskHandle_t tasks[NUM_SCREENS];
+SemaphoreHandle_t epdUpdateSemaphore[NUM_SCREENS];
 uint8_t qrcode[qrcodegen_BUFFER_LEN_MAX];
 
 void setupDisplays()
@@ -98,7 +100,7 @@ void resetAllDisplays()
     digitalWrite(RST_PIN, HIGH);
     delay(200);
     #else 
-    for (int i = 0; i < displaySize; i++) {
+    for (int i = 0; i < NUM_SCREENS; i++) {
         resetSingleDisplay(i);
     }
     #endif NO_MCP
@@ -118,7 +120,7 @@ void resetSingleDisplay(int i)
 
 void initDisplays()
 {
-    for (uint i = 0; i < displaySize; i++)
+    for (uint i = 0; i < NUM_SCREENS; i++)
     {
 #ifndef NO_MCP
         mcp.pinMode(EPD_RESET_MPD[i], OUTPUT);
@@ -131,8 +133,7 @@ void initDisplays()
         //  displays[i].epd2.init(SW_SCK, SW_MOSI, 115200, true, 20, false);
     }
 
-    std::string text = "BTClock";
-    for (uint i = 0; i < displaySize; i++)
+    for (uint i = 0; i < NUM_SCREENS; i++)
     {
         epdUpdateSemaphore[i] = xSemaphoreCreateBinary();
         xSemaphoreGive(epdUpdateSemaphore[i]);
@@ -145,7 +146,7 @@ void initDisplays()
                                                                                        //  delay(1000);
     }
     epdContent = {"B", "T", "C", "L", "O", "C", "K"};
-    for (uint i = 0; i < displaySize; i++)
+    for (uint i = 0; i < NUM_SCREENS; i++)
     {
         xTaskNotifyGive(tasks[i]);
     }
@@ -185,7 +186,7 @@ void taskEpd(void *pvParameters)
         bool updatedThisCycle = false;
 
 
-        for (uint i = 0; i < displaySize; i++)
+        for (uint i = 0; i < NUM_SCREENS; i++)
         {
             if (epdContent[i].compareTo(currentEpdContent[i]) != 0)
             {
@@ -234,7 +235,7 @@ void setEpdContent(std::array<String, 7> newEpdContent)
     epdContent = newEpdContent;
 }
 
-void splitText(uint dispNum, String top, String bottom, bool partial)
+void splitText(const uint dispNum, String top, String bottom, bool partial)
 {
     displays[dispNum].setRotation(2);
     displays[dispNum].setFont(&FONT_SMALL);
@@ -270,7 +271,7 @@ void splitText(uint dispNum, String top, String bottom, bool partial)
     displays[dispNum].print(bottom);
 }
 
-void showDigit(uint dispNum, char chr, bool partial, const GFXfont *font)
+void showDigit(const uint dispNum, char chr, bool partial, const GFXfont *font)
 {
     String str(chr);
     displays[dispNum].setRotation(2);
@@ -291,7 +292,7 @@ void fullRefresh(void *pvParameters)
 {
     resetAllDisplays();
 
-    for (uint i = 0; i < displaySize; i++)
+    for (uint i = 0; i < NUM_SCREENS; i++)
     {
         lastFullRefresh[i] = NULL;
     }
@@ -428,13 +429,13 @@ void showSetupQr(String ssid, String password)
         displays[displayIndex].println("Welcome!");
     } while (displays[displayIndex].nextPage());
 
-    for (int i = 1; i < displaySize; (i = i+2)) {
+    for (int i = 1; i < NUM_SCREENS; (i = i+2)) {
         displays[i].setPartialWindow(0, 0, displays[i].width(), displays[i].height());
         displays[i].fillScreen(GxEPD_WHITE);
         displays[i].display(true);
     }
 
-    for (int i = 0; i < displaySize; i++) {
+    for (int i = 0; i < NUM_SCREENS; i++) {
         displays[i].hibernate();
     }
 }

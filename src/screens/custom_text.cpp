@@ -1,7 +1,7 @@
 #include "custom_text.hpp"
 
 std::string CustomTextScreen::customText = "";
-std::array<String, 7> CustomTextScreen::epdContent = {"", "", "", "", "", "", ""};
+std::array<String, NUM_SCREENS> CustomTextScreen::epdContent = {"", "", "", "", "", "", ""};
 
 void CustomTextScreen::init()
 {
@@ -12,11 +12,11 @@ void CustomTextScreen::showScreen()
 {
 }
 
-void CustomTextScreen::setSimpleText(String text)
+void CustomTextScreen::setSimpleText(const String& text)
 {
     customText = text.c_str();
 
-    customText.insert(customText.begin(), 7 - customText.length(), ' ');
+    customText.insert(customText.begin(), NUM_SCREENS - customText.length(), ' ');
 
     for (uint i = 0; i < 7; i++)
     {
@@ -24,7 +24,7 @@ void CustomTextScreen::setSimpleText(String text)
     }
 }
 
-void CustomTextScreen::setText(std::array<String, 7> customContent)
+void CustomTextScreen::setText(std::array<String, NUM_SCREENS> customContent)
 {
     epdContent = customContent;
 }

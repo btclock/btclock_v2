@@ -9,10 +9,10 @@
 class BlockHeightScreen {
     protected:
         static  uint blockNr;
-        static std::array<String, 7> epdContent;
+        static std::array<String, NUM_SCREENS> epdContent;
     public:
         static void init();
         static void showScreen();
         static void onNewBlock(uint blockNr);
-        static std::array<String, 7> getEpdContent();
+        static std::array<String, NUM_SCREENS> getEpdContent();
 };

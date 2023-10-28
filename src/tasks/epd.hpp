@@ -40,8 +40,8 @@ void resetSingleDisplay(int i);
 std::array<String, 7> getCurrentEpdContent();
 
 void setEpdContent(std::array<String, 7> newEpdContent);
-void splitText(uint dispNum, String top, String bottom, bool partial);
-void showDigit(uint dispNum, char chr, bool partial, const GFXfont *font);
+void splitText(const uint dispNum, String top, String bottom, bool partial);
+void showDigit(const uint dispNum, char chr, bool partial, const GFXfont *font);
 
 void refreshDisplay(void *pvParameters);
 void fullRefresh(void *pvParameters);

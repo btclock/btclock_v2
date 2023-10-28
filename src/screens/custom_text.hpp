@@ -10,11 +10,11 @@
 class CustomTextScreen {
     protected:
         static std::string customText;
-        static std::array<String, 7> epdContent;
+        static std::array<String, NUM_SCREENS> epdContent;
     public:
         static void init();
         static void showScreen();
-        static std::array<String, 7> getEpdContent();
-        static void setSimpleText(String text);
+        static std::array<String, NUM_SCREENS> getEpdContent();
+        static void setSimpleText(const String& text);
         static void setText(std::array<String, 7> customContent);
 };

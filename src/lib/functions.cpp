@@ -43,6 +43,14 @@ void setupSoftAP()
 
 void setupComponents()
 {
+    if (psramInit())
+    {
+        Serial.println("\nPSRAM is correctly initialized");
+    }
+    else
+    {
+        Serial.println("PSRAM not available");
+    }
 #ifdef WITH_RGB_LED
     pixels.begin();
     pixels.setPixelColor(0, pixels.Color(255, 0, 0));
@@ -299,7 +307,6 @@ void toggleScreenTimer()
     }
 }
 
-
 void timebasedChangeTask(void *parameter)
 {
     uint32_t moment = millis();
@@ -393,7 +400,7 @@ void setLights(int r, int g, int b)
 
 void flashTemporaryLights(int r, int g, int b)
 {
-    #ifdef WITH_RGB_LED
+#ifdef WITH_RGB_LED
 
     uint32_t oldLights[NEOPIXEL_COUNT];
 
@@ -404,7 +411,8 @@ void flashTemporaryLights(int r, int g, int b)
     }
 
     // flash three times in given color
-    for (int t = 0; t < 3; t++) {
+    for (int t = 0; t < 3; t++)
+    {
         for (int i = 0; i < NEOPIXEL_COUNT; i++)
         {
             pixels.setPixelColor(i, pixels.Color(r, g, b));
@@ -425,7 +433,7 @@ void flashTemporaryLights(int r, int g, int b)
     }
 
     pixels.show();
-    #endif
+#endif
 }
 
 void setupI2C()

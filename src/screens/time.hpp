@@ -7,8 +7,6 @@
 
 class TimeScreen {
     protected:
-        static String timeString;
-        static String dateString;
         static std::array<String, 7> epdContent;
         static TimeScreen* instance_;
     public:

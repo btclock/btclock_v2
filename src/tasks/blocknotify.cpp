@@ -1,6 +1,6 @@
 #include "blocknotify.hpp"
 
-int currentBlockHeight = 789000;
+uint currentBlockHeight = 789000;
 QueueHandle_t bitcoinQueue;
 BitcoinEvent bitcoinEvent;
 const String NEW_BLOCK_MINED_EVENT = "new_block_mined";
@@ -17,7 +17,7 @@ bool useBitcoind = true;
 
 void checkBitcoinBlock(void *pvParameters)
 {
-    int blockHeight = preferences.getUInt("blockHeight", currentBlockHeight);
+    uint blockHeight = preferences.getUInt("blockHeight", currentBlockHeight);
  
   
     useBitcoind = preferences.getBool("useNode", false) && wifiClientInsecure.connect(preferences.getString("rpcHost", BITCOIND_HOST).c_str(), preferences.getUInt("rpcPort", BITCOIND_PORT));
@@ -26,7 +26,14 @@ void checkBitcoinBlock(void *pvParameters)
     else
         Serial.println("bitcoind node is not reachable, using mempool API instead.");
 
-    
+    IPAddress result;
+
+    int err = WiFi.hostByName(preferences.getString("mempoolInstance", DEFAULT_MEMPOOL_INSTANCE).c_str(), result) ;
+
+    if (err != 1) {
+        flashTemporaryLights(255, 0, 0);
+    }
+
     for (;;)
     {
         HTTPClient http;

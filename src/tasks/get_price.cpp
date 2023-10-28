@@ -31,7 +31,7 @@ void taskGetPrice(void *pvParameters)
             if (httpCode == 200)
             {
                 String payload = http.getString();
-                StaticJsonDocument<768> doc;
+                SpiRamJsonDocument doc(768);
                 deserializeJson(doc, payload);
                 JsonObject bpi = doc["bitcoin"];
                 usdPrice = bpi["usd"];
@@ -61,7 +61,7 @@ void taskGetPrice(void *pvParameters)
             if (httpCode == 200)
             {
                 String payload = http.getString();
-                StaticJsonDocument<768> doc;
+                SpiRamJsonDocument doc(768);
                 deserializeJson(doc, payload);
                 JsonObject bpi = doc["bpi"];
                 usdPrice = bpi["USD"]["rate_float"];
