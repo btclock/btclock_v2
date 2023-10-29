@@ -22,6 +22,6 @@ void checkBitcoinBlock(void *pvParameters);
 //void bitcoinEventHandler(void *pvParameters);
 void setupBlockNotify();
 
-void registerNewBlockCallback(EventCallbackWithNumber cb);
+void registerNewBlockCallback(const EventCallbackWithNumber cb);
 int getBlockFromBitcoind();
 int getBlockFromMempoolSpace();

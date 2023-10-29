@@ -11,4 +11,4 @@ extern TaskHandle_t minuteTaskHandle;
 
 void minuteTask(void *pvParameters);
 void setupMinuteEvent();
-void registerNewMinuteCallback(EventCallback cb);
+void registerNewMinuteCallback(const EventCallback cb);

@@ -1,17 +1,12 @@
 #include "epd.hpp"
 
 #ifdef IS_S3
-// reversed
-// const int EPD_CS[7] = {17, 21, 33, 10, 6, 4, 2};
-// const int EPD_BUSY[7] = {16, 18, 37, 9, 7, 5, 3};
-// const int EPD_RESET_MPD[7] = {14, 13, 12, 11, 10, 9, 8};
+const char EPD_CS[NUM_SCREENS] = {2, 4, 6, 10, 33, 21, 17};
+const char EPD_BUSY[NUM_SCREENS] = {3, 5, 7, 9, 37, 18, 16};
+const char EPD_RESET_MPD[NUM_SCREENS] = {8, 9, 10, 11, 12, 13, 14};
 
-const int EPD_CS[NUM_SCREENS] = {2, 4, 6, 10, 33, 21, 17};
-const int EPD_BUSY[NUM_SCREENS] = {3, 5, 7, 9, 37, 18, 16};
-const int EPD_RESET_MPD[NUM_SCREENS] = {8, 9, 10, 11, 12, 13, 14};
-
-const int EPD_DC = 14;
-const int RST_PIN = 15;
+const char EPD_DC = 14;
+const char RST_PIN = 15;
 #elif defined(IS_S2)
 
 // reversed
@@ -56,7 +51,7 @@ GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> displays[NUM_SCREENS] = {
     GxEPD2_213_B74(EPD_CS[6], EPD_DC, /*RST=*/-1, EPD_BUSY[6]),
 };
 
-//GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> * displays2 = (GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> *) ps_malloc(7 * sizeof (GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT>));
+// GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> * displays2 = (GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> *) ps_malloc(7 * sizeof (GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT>));
 
 const int SEM_WAIT_TIME = 10000;
 
@@ -81,7 +76,10 @@ std::array<String, 7> currentEpdContent;
 std::array<String, 7> epdContent;
 TaskHandle_t tasks[NUM_SCREENS];
 SemaphoreHandle_t epdUpdateSemaphore[NUM_SCREENS];
-uint8_t qrcode[qrcodegen_BUFFER_LEN_MAX];
+//
+
+//int *qrcode = (int *) ps_malloc(qrcodegen_BUFFER_LEN_MAX * sizeof(uint8_t));
+
 
 void setupDisplays()
 {
@@ -91,7 +89,7 @@ void setupDisplays()
 
 void resetAllDisplays()
 {
-    #ifdef NO_MCP
+#ifdef NO_MCP
     digitalWrite(RST_PIN, HIGH);
     pinMode(RST_PIN, OUTPUT);
     delay(20);
@@ -99,23 +97,24 @@ void resetAllDisplays()
     delay(20);
     digitalWrite(RST_PIN, HIGH);
     delay(200);
-    #else 
-    for (int i = 0; i < NUM_SCREENS; i++) {
+#else
+    for (int i = 0; i < NUM_SCREENS; i++)
+    {
         resetSingleDisplay(i);
     }
-    #endif NO_MCP
+#endif
 }
 
 void resetSingleDisplay(int i)
 {
-    #ifndef NO_MCP
+#ifndef NO_MCP
     mcp.digitalWrite(EPD_RESET_MPD[i], HIGH);
     delay(20);
     mcp.digitalWrite(EPD_RESET_MPD[i], LOW);
     delay(20);
     mcp.digitalWrite(EPD_RESET_MPD[i], HIGH);
     delay(200);
-    #endif
+#endif
 }
 
 void initDisplays()
@@ -166,7 +165,7 @@ void taskEpd(void *pvParameters)
             epdContent = TickerScreen::getEpdContent();
             break;
         case SCREEN_MSCW_TIME:
-            epdContent = SatsPerDollarScreen::getEpdContent();
+            epdContent = TickerScreen::getEpdContentSats();
             break;
         case SCREEN_TIME:
             epdContent = TimeScreen::getEpdContent();
@@ -182,9 +181,7 @@ void taskEpd(void *pvParameters)
             break;
         }
 
-
         bool updatedThisCycle = false;
-
 
         for (uint i = 0; i < NUM_SCREENS; i++)
         {
@@ -214,12 +211,12 @@ void taskEpd(void *pvParameters)
             }
         }
 
-        #ifdef WITH_RGB_LED
+#ifdef WITH_RGB_LED
         if (updatedThisCycle && preferences.getBool("ledFlashOnUpd", false))
         {
             xTaskNotifyGive(ledHandlerTaskHandle);
         }
-        #endif
+#endif
 
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
@@ -321,7 +318,7 @@ void updateDisplay(void *pvParameters)
             bool updatePartial = true;
 
             // Full Refresh every half hour
-            if (!lastFullRefresh[epdIndex] || (millis() - lastFullRefresh[epdIndex])  > (preferences.getUInt("fullRefreshMin", 30) * 60 * 1000))
+            if (!lastFullRefresh[epdIndex] || (millis() - lastFullRefresh[epdIndex]) > (preferences.getUInt("fullRefreshMin", 30) * 60 * 1000))
             {
                 updatePartial = false;
                 lastFullRefresh[epdIndex] = millis();
@@ -346,96 +343,3 @@ void updateDisplay(void *pvParameters)
     }
 }
 
-void showSetupQr(String ssid, String password)
-{
-    int displayIndex = 6;
-    
-    const String text = "WIFI:S:" + ssid + ";T:WPA;P:" + password + ";;"; 
-
-    uint8_t tempBuffer[qrcodegen_BUFFER_LEN_MAX];
-    bool ok = qrcodegen_encodeText(text.c_str(), tempBuffer, qrcode, qrcodegen_Ecc_LOW,
-                                qrcodegen_VERSION_MIN, qrcodegen_VERSION_MAX, qrcodegen_Mask_AUTO, true);
-
-    const int size = qrcodegen_getSize(qrcode);
-
-    const int padding = floor(float(displays[displayIndex].width() - (size * 4)) / 2);
-    const int paddingY = floor(float(displays[displayIndex].height() - (size * 4)) / 2);
- 
-    displays[displayIndex].setPartialWindow(0, 0, displays[displayIndex].width(), displays[displayIndex].height());
-    displays[displayIndex].firstPage();
-
-    displays[displayIndex].fillScreen(GxEPD_WHITE);
-    int border = 0;
-    do
-    {
-        for (int y = -border; y < size * 4 + border; y++)
-        {
-            for (int x = -border; x < size * 4 + border; x++)
-            {
-                displays[displayIndex].drawPixel(padding + x, paddingY + y, qrcodegen_getModule(qrcode, floor(float(x) / 4), floor(float(y) / 4)) ? GxEPD_BLACK : GxEPD_WHITE);
-            }
-        }
-    } while (displays[displayIndex].nextPage());
-
-    displayIndex = 4;
-
-    displays[displayIndex].setPartialWindow(0, 0, displays[displayIndex].width(), displays[displayIndex].height());
-    displays[displayIndex].firstPage();
-
-    displays[displayIndex].fillScreen(GxEPD_WHITE);
-    do
-    {
-        displays[displayIndex].setTextColor(GxEPD_BLACK);
-        displays[displayIndex].setCursor(0, 50);
-        displays[displayIndex].setFont(&FreeSansBold9pt7b);
-        displays[displayIndex].println("SSID:");
-        displays[displayIndex].setFont(&FreeSans9pt7b);
-        displays[displayIndex].println(ssid);
-        displays[displayIndex].println("");
-        displays[displayIndex].setFont(&FreeSansBold9pt7b);
-        displays[displayIndex].println("Password:");
-        displays[displayIndex].setFont(&FreeSans9pt7b);
-        displays[displayIndex].println(password);
-    } while (displays[displayIndex].nextPage());
-
-    displayIndex = 2;
-
-    displays[displayIndex].setPartialWindow(0, 0, displays[displayIndex].width(), displays[displayIndex].height());
-    displays[displayIndex].firstPage();
-
-    displays[displayIndex].fillScreen(GxEPD_WHITE);
-    do
-    {
-        displays[displayIndex].setTextColor(GxEPD_BLACK);
-        displays[displayIndex].setCursor(0, 50);
-        displays[displayIndex].setFont(&FreeSans9pt7b);
-        displays[displayIndex].println("To setup");
-        displays[displayIndex].println("scan QR or");
-        displays[displayIndex].println("connect");
-        displays[displayIndex].println("manually");
-    } while (displays[displayIndex].nextPage());
-
-    displayIndex = 0;
-
-    displays[displayIndex].setPartialWindow(0, 0, displays[displayIndex].width(), displays[displayIndex].height());
-    displays[displayIndex].firstPage();
-
-    displays[displayIndex].fillScreen(GxEPD_WHITE);
-    do
-    {
-        displays[displayIndex].setTextColor(GxEPD_BLACK);
-        displays[displayIndex].setCursor(0, 50);
-        displays[displayIndex].setFont(&FreeSansBold9pt7b);
-        displays[displayIndex].println("Welcome!");
-    } while (displays[displayIndex].nextPage());
-
-    for (int i = 1; i < NUM_SCREENS; (i = i+2)) {
-        displays[i].setPartialWindow(0, 0, displays[i].width(), displays[i].height());
-        displays[i].fillScreen(GxEPD_WHITE);
-        displays[i].display(true);
-    }
-
-    for (int i = 0; i < NUM_SCREENS; i++) {
-        displays[i].hibernate();
-    }
-}

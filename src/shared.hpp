@@ -1,10 +1,17 @@
 #pragma once
 
+#include "config.h"
 #include <Arduino.h>
 //##include <Crypto.h>
 #include <ArduinoJson.h>
 #include <WiFi.h>
 #include <map>
+
+#ifdef IS_BW
+#include <GxEPD2_BW.h>
+#else 
+#include <GxEPD2_3C.h>
+#endif
 
 #include <WiFiClientSecure.h>
 #ifndef NO_MCP
@@ -19,7 +26,7 @@
 typedef std::function<void()> EventCallback;
 typedef std::function<void(uint number)> EventCallbackWithNumber;
 
-extern WiFiClient wifiClientInsecure;
+//extern WiFiClient wifiClientInsecure;
 extern WiFiClientSecure wifiClient;
 
 extern ESP32Time rtc;
@@ -32,9 +39,11 @@ extern bool timerRunning;
 extern uint timerSeconds;
 extern uint32_t moment;
 
+extern GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> displays[NUM_SCREENS];
+
 #ifndef NO_MCP
 extern Adafruit_MCP23X17 mcp;
-extern const int MCP_INT_PIN;
+extern const char MCP_INT_PIN;
 #endif
 #ifdef WITH_RGB_LED
 extern Adafruit_NeoPixel pixels;
@@ -53,13 +62,17 @@ const PROGMEM int screens[5] = { SCREEN_BLOCK_HEIGHT, SCREEN_MSCW_TIME, SCREEN_B
 const uint screenCount = sizeof(screens) / sizeof(int);
 
 struct SpiRamAllocator {
-        void* allocate(size_t size) {
-                return ps_malloc(size);
+  void* allocate(size_t size) {
+    return heap_caps_malloc(size, MALLOC_CAP_SPIRAM);
+  }
 
-        }
-        void deallocate(void* pointer) {
-                free(pointer);
-        }
+  void deallocate(void* pointer) {
+    heap_caps_free(pointer);
+  }
+
+  void* reallocate(void* ptr, size_t new_size) {
+    return heap_caps_realloc(ptr, new_size, MALLOC_CAP_SPIRAM);
+  }
 };
 
 using SpiRamJsonDocument = BasicJsonDocument<SpiRamAllocator>;

@@ -38,7 +38,7 @@ void setupMinuteEvent()
     xTaskCreate(minuteTask, "MinuteTask", 2048, NULL, 1, &minuteTaskHandle); // Create the FreeRTOS task
 }
 
-void registerNewMinuteCallback(EventCallback cb)
+void registerNewMinuteCallback(const EventCallback cb)
 {
   minuteEventCallbacks.push_back(cb);
 } 

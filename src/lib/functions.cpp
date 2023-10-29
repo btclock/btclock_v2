@@ -7,7 +7,7 @@ std::map<int, std::string> screenNameMap;
 
 #ifndef NO_MCP
 Adafruit_MCP23X17 mcp;
-const int MCP_INT_PIN = 8;
+const char MCP_INT_PIN = 8;
 
 #endif
 bool timerRunning = true;
@@ -27,7 +27,7 @@ Adafruit_NeoPixel pixels(NEOPIXEL_COUNT, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
 String softAP_SSID;
 String softAP_password;
-WiFiMulti wifiMulti;
+//WiFiMulti wifiMulti;
 
 WiFiManager wm;
 bool screenVisible[5];
@@ -36,20 +36,20 @@ void setupSoftAP()
 {
     byte mac[6];
     WiFi.macAddress(mac);
-    softAP_SSID = String("BTClock" + String(mac[5], 16) + String(mac[6], 16));
+    softAP_SSID = String("BTClock" + String(mac[5], 16) + String(mac[1], 16));
     WiFi.setHostname(softAP_SSID.c_str());
-    softAP_password = base64::encode(String(mac[2], 16) + String(mac[4], 16) + String(mac[5], 16) + String(mac[6], 16)).substring(2, 10);
+    softAP_password = base64::encode(String(mac[2], 16) + String(mac[4], 16) + String(mac[5], 16) + String(mac[1], 16)).substring(2, 10);
 }
 
 void setupComponents()
 {
     if (psramInit())
     {
-        Serial.println("\nPSRAM is correctly initialized");
+        Serial.println(F("PSRAM is correctly initialized"));
     }
     else
     {
-        Serial.println("PSRAM not available");
+        Serial.println(F("PSRAM not available"));
     }
 #ifdef WITH_RGB_LED
     pixels.begin();
@@ -61,12 +61,12 @@ void setupComponents()
 #endif
 
     // delay(3000);
-    // Serial.println("Leds should be on");
+    // Serial.println(F("Leds should be on"));
 
 #ifndef NO_MCP
     if (!mcp.begin_I2C())
     {
-        Serial.println("Error MCP23017");
+        Serial.println(F("Error MCP23017"));
         pixels.setPixelColor(0, pixels.Color(255, 0, 0));
         pixels.setPixelColor(1, pixels.Color(255, 0, 0));
         pixels.setPixelColor(2, pixels.Color(255, 0, 0));
@@ -77,7 +77,7 @@ void setupComponents()
     }
     else
     {
-        Serial.println("MCP23017 ok");
+        Serial.println(F("MCP23017 ok"));
         pixels.setPixelColor(0, pixels.Color(0, 255, 0));
         pixels.setPixelColor(1, pixels.Color(0, 255, 0));
         pixels.setPixelColor(2, pixels.Color(0, 255, 0));
@@ -107,7 +107,7 @@ void synchronizeTime()
     {
         configTime(preferences.getInt("gmtOffset", TIME_OFFSET_SECONDS), 0, NTP_SERVER);
         delay(500);
-        Serial.println("Retry set time");
+        Serial.println(F("Retry set time"));
     }
 
     rtc.setTimeStruct(timeinfo);
@@ -134,7 +134,7 @@ void setupWifi()
             pixels.setPixelColor(2, pixels.Color(255, 0, 0));
             pixels.setPixelColor(3, pixels.Color(0, 0, 255));
             pixels.show();
-            Serial.println("Erasing WiFi Config, restarting");
+            Serial.println(F("Erasing WiFi Config, restarting"));
             wm.resetSettings();
             ESP.restart();
         }
@@ -252,7 +252,7 @@ void toggleScreenTimer()
 
     if (!timerRunning)
     {
-        Serial.println("Stopping screen timer...");
+        Serial.println(F("Stopping screen timer..."));
         for (int i = NEOPIXEL_COUNT; i >= 0; i--)
         {
             for (int j = NEOPIXEL_COUNT; j >= 0; j--)
@@ -275,7 +275,7 @@ void toggleScreenTimer()
     }
     else
     {
-        Serial.println("Starting screen timer...");
+        Serial.println(F("Starting screen timer..."));
 
         pixels.setPixelColor(3, pixels.Color(0, 255, 0));
         pixels.setPixelColor(2, pixels.Color(0, 0, 0));
@@ -442,7 +442,7 @@ void setupI2C()
 
     if (slaveMode)
     {
-        Serial.println("I2C Slave Mode enabled");
+        Serial.println(F("I2C Slave Mode enabled"));
         Wire.onReceive(onI2CReceive);
         Wire.begin((uint8_t)I2C_DEV_ADDR);
     }
@@ -461,5 +461,5 @@ void onI2CReceive(int len)
 void onI2CRequest()
 {
     Wire.print("I2C Packets.");
-    Serial.println("onRequest");
+    Serial.println(F("onRequest"));
 }

@@ -20,11 +20,11 @@ void checkBitcoinBlock(void *pvParameters)
     uint blockHeight = preferences.getUInt("blockHeight", currentBlockHeight);
  
   
-    useBitcoind = preferences.getBool("useNode", false) && wifiClientInsecure.connect(preferences.getString("rpcHost", BITCOIND_HOST).c_str(), preferences.getUInt("rpcPort", BITCOIND_PORT));
+    useBitcoind = preferences.getBool("useNode", false) && wifiClient.connect(preferences.getString("rpcHost", BITCOIND_HOST).c_str(), preferences.getUInt("rpcPort", BITCOIND_PORT));
     if (useBitcoind)
-        Serial.println("bitcoind node is reachable, using this for blocks.");
+        Serial.println(F("bitcoind node is reachable, using this for blocks."));
     else
-        Serial.println("bitcoind node is not reachable, using mempool API instead.");
+        Serial.println(F("bitcoind node is not reachable, using mempool API instead."));
 
     IPAddress result;
 
@@ -36,53 +36,53 @@ void checkBitcoinBlock(void *pvParameters)
 
     for (;;)
     {
-        HTTPClient http;
-        http.setUserAgent(USER_AGENT);
+        HTTPClient *http = new HTTPClient();
+        http->setUserAgent(USER_AGENT);
 
         if (useBitcoind)
         {
             StaticJsonDocument<200> jsonDoc;
 
-            http.begin(preferences.getString("rpcHost", BITCOIND_HOST).c_str(), preferences.getUInt("rpcPort", BITCOIND_PORT));
-            http.addHeader("Content-Type", "application/json");
+            http->begin(preferences.getString("rpcHost", BITCOIND_HOST).c_str(), preferences.getUInt("rpcPort", BITCOIND_PORT));
+            http->addHeader("Content-Type", "application/json");
 
             const String payload = "{\"jsonrpc\":\"1.0\",\"id\":\"current_block_height\",\"method\":\"getblockcount\",\"params\":[]}";
             const String authEncoded = base64::encode(preferences.getString("rpcUser", BITCOIND_RPC_USER) + ":" + preferences.getString("rpcPass", BITCOIND_RPC_PASS));
-            http.addHeader("Authorization", "Basic " + authEncoded);
+            http->addHeader("Authorization", "Basic " + authEncoded);
 
-            int httpCode = http.POST(payload);
+            int httpCode = http->POST(payload);
             if (httpCode > 0 || httpCode != HTTP_CODE_UNAUTHORIZED)
             {
-                String response = http.getString();
+                String response = http->getString();
                 deserializeJson(jsonDoc, response);
                 blockHeight = jsonDoc["result"];
             }
             else
             {
-                Serial.println("Error in HTTP request to bitcoind");
+                Serial.println(F("Error in HTTP request to bitcoind"));
             }
 
-            http.end();
+            http->end();
         }
         else
         {
-            http.begin("https://" + preferences.getString("mempoolInstance", DEFAULT_MEMPOOL_INSTANCE) + "/api/blocks/tip/height");
-            int httpCode = http.GET();
+            http->begin("https://" + preferences.getString("mempoolInstance", DEFAULT_MEMPOOL_INSTANCE) + "/api/blocks/tip/height");
+            int httpCode = http->GET();
 
             if (httpCode > 0 && httpCode == HTTP_CODE_OK)
             {
-                String blockHeightStr = http.getString();
+                String blockHeightStr = http->getString();
                 blockHeight = blockHeightStr.toInt();
             }
             else
             {
                 Serial.print(F("Error in HTTP request to mempool API: "));
                 Serial.print(httpCode);
-                Serial.println(http.errorToString(httpCode));
+                Serial.println(http->errorToString(httpCode));
 
             }
 
-            http.end();
+            http->end();
         }
         if (blockHeight > currentBlockHeight)
         {
@@ -93,7 +93,7 @@ void checkBitcoinBlock(void *pvParameters)
             currentBlockHeight = blockHeight;
             preferences.putUInt("blockHeight", currentBlockHeight);
         }
-
+        delete http; 
         vTaskDelay(pdMS_TO_TICKS(BLOCKNOTIFY_WAIT_TIME)); // wait 1 minute before checking again
     }
 }
@@ -126,7 +126,7 @@ void setupBlockNotify()
     //  xTaskCreate(bitcoinEventHandler, "bitcoinEventHandler", 10000, NULL, 110, NULL);
 }
 
-void registerNewBlockCallback(EventCallbackWithNumber cb)
+void registerNewBlockCallback(const EventCallbackWithNumber cb)
 {
     blockEventCallbacks.push_back(cb);
 }

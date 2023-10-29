@@ -5,8 +5,7 @@
 #else 
 #include <GxEPD2_3C.h>
 #endif
-#include <Fonts/FreeSansBold9pt7b.h>
-#include <Fonts/FreeSans9pt7b.h>
+
 
 #include <string>
 #include "screens/blockheight.hpp"
@@ -17,7 +16,6 @@
 #include "screens/custom_text.hpp"
 #include "screens/halvingcountdown.hpp"
 
-#include "qrcodegen.h"
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -47,4 +45,3 @@ void refreshDisplay(void *pvParameters);
 void fullRefresh(void *pvParameters);
 void updateDisplay(void *pvParameters);
 //void genQrCode(String text, uint8_t *qrcode[qrcodegen_BUFFER_LEN_MAX]);
-void showSetupQr(String ssid, String password);

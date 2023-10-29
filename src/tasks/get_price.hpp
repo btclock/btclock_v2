@@ -6,9 +6,10 @@
 #include <freertos/task.h>
 #include "shared.hpp"
 #include "config.h"
+#include "lib/functions.hpp"
 
 extern TaskHandle_t getPriceTaskHandle;
 
 void taskGetPrice(void *pvParameters);
 void setupGetPriceTask();
-void registerNewPriceCallback(EventCallbackWithNumber cb);
+void registerNewPriceCallback(const EventCallbackWithNumber cb);

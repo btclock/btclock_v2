@@ -47,7 +47,7 @@ void buttonTask(void *parameter)
 void IRAM_ATTR handleButtonInterrupt()
 {
     buttonPressed = true;
-    // Serial.println("ISR");
+    // Serial.println(F("ISR"));
     // uint pin = mcp.getLastInterruptPin();
 
     // if (pin == 1)
@@ -70,7 +70,7 @@ void setupButtonTask()
     // attachInterrupt(MCP_INT_PIN, handleButtonInterrupt, FALLING);
 }
 
-void registerNewButtonCallback(EventCallback cb)
+void registerNewButtonCallback(const EventCallback cb)
 {
     buttonEventCallbacks.push_back(cb);
 }

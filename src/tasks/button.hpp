@@ -14,7 +14,7 @@ extern TaskHandle_t buttonTaskHandle;
 
 void buttonTask(void *pvParameters);
 void setupButtonTask();
-void registerNewButtonCallback(EventCallback cb);
+void registerNewButtonCallback(const EventCallback cb);
 void IRAM_ATTR handleButtonInterrupt();
 
 #endif

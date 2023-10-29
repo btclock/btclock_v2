@@ -14,29 +14,37 @@ TaskHandle_t getPriceTaskHandle;
 
 void taskGetPrice(void *pvParameters)
 {
+    IPAddress result;
+
+    int err = WiFi.hostByName("api.coingecko.com", result) ;
+
+    if (err != 1) {
+        flashTemporaryLights(255, 255, 0);
+    }
+
     for (;;)
     {
-        HTTPClient http;
-        http.setUserAgent(USER_AGENT);
+        HTTPClient* http = new HTTPClient();
+        http->setUserAgent(USER_AGENT);
 
         if (true)
         {
             // Send HTTP request to CoinGecko API
-            http.begin(cgApiUrl);
+            http->begin(cgApiUrl);
 
-            int httpCode = http.GET();
+            int httpCode = http->GET();
 
             // Parse JSON response and extract average price
             float usdPrice, eurPrice;
             if (httpCode == 200)
             {
-                String payload = http.getString();
+                String payload = http->getString();
                 SpiRamJsonDocument doc(768);
                 deserializeJson(doc, payload);
                 JsonObject bpi = doc["bitcoin"];
                 usdPrice = bpi["usd"];
                 eurPrice = bpi["eur"];
-                for (auto &callback : priceEventCallbacks)
+                for (EventCallbackWithNumber &callback : priceEventCallbacks)
                 { // Loop through all the event callbacks and call them
                     callback(usdPrice);
                 }
@@ -52,21 +60,21 @@ void taskGetPrice(void *pvParameters)
         } else {
 
             // Send HTTP request to CoinDesk API
-            http.begin(apiUrl);
+            http->begin(apiUrl);
 
-            int httpCode = http.GET();
+            int httpCode = http->GET();
 
             // Parse JSON response and extract average price
             float usdPrice, eurPrice;
             if (httpCode == 200)
             {
-                String payload = http.getString();
+                String payload = http->getString();
                 SpiRamJsonDocument doc(768);
                 deserializeJson(doc, payload);
                 JsonObject bpi = doc["bpi"];
                 usdPrice = bpi["USD"]["rate_float"];
                 eurPrice = bpi["EUR"]["rate_float"];
-                for (auto &callback : priceEventCallbacks)
+                for (EventCallbackWithNumber &callback : priceEventCallbacks)
                 { // Loop through all the event callbacks and call them
                     callback(usdPrice);
                 }
@@ -81,7 +89,9 @@ void taskGetPrice(void *pvParameters)
             }
         }
 
-        http.end();
+        http->end();
+
+        delete http;
 
         vTaskDelay(pdMS_TO_TICKS(PRICE_WAIT_TIME));
     }
@@ -91,12 +101,12 @@ void setupGetPriceTask()
 {
     if (getPriceTaskHandle == nullptr)
     {
-        xTaskCreate(taskGetPrice, "getPrice", 8192, NULL, 1, &getPriceTaskHandle);
+        xTaskCreate(taskGetPrice, "getPrice", 6144, NULL, 1, &getPriceTaskHandle);
         vTaskSuspend(getPriceTaskHandle);
     }
 }
 
-void registerNewPriceCallback(EventCallbackWithNumber cb)
+void registerNewPriceCallback(const EventCallbackWithNumber cb)
 {
     priceEventCallbacks.push_back(cb);
 }

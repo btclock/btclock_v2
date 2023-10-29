@@ -18,7 +18,7 @@
 #include "screens/blockheight.hpp"
 #include "screens/ticker.hpp"
 #include "screens/time.hpp"
-#include "screens/sats_per_dollar.hpp"
+//#include "screens/sats_per_dollar.hpp"
 #include "screens/halvingcountdown.hpp"
 
 #include "tasks/ha.hpp"
@@ -26,7 +26,7 @@
 #include "tasks/button.hpp"
 #include "tasks/led_handler.hpp"
 
-WiFiClient wifiClientInsecure;
+//WiFiClient wifiClientInsecure;
 WiFiClientSecure wifiClient;
 ESP32Time rtc(3600);
 
@@ -63,8 +63,9 @@ void setup()
 
     TimeScreen::init();
     BlockHeightScreen::init();
+    HalvingCountdownScreen::init();
     TickerScreen::init();
-    SatsPerDollarScreen::init();
+ //   SatsPerDollarScreen::init();
 
 #ifdef WITH_BUTTONS
     setupButtonTask();
@@ -79,7 +80,7 @@ void setup()
     registerNewBlockCallback(BlockHeightScreen::onNewBlock);
     registerNewBlockCallback(HalvingCountdownScreen::onNewBlock);
     registerNewPriceCallback(TickerScreen::onPriceUpdate);
-    registerNewPriceCallback(SatsPerDollarScreen::onPriceUpdate);
+//    registerNewPriceCallback(SatsPerDollarScreen::onPriceUpdate);
 
     setupDisplays();
   } else {

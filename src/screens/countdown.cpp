@@ -38,6 +38,6 @@ void CountdownScreen::countdownTask(void *pvParameters)
         }
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
-    Serial.println("Countdown finished!");
+    Serial.println(F("Countdown finished!"));
     vTaskDelete(NULL);
 }

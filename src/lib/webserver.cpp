@@ -9,10 +9,7 @@ void setupWebserver()
     // Initialize SPIFFS
     if (!SPIFFS.begin(true))
     {
-        pinMode(47, OUTPUT);
-        digitalWrite(47, HIGH);
-
-        Serial.println("An Error has occurred while mounting SPIFFS");
+        Serial.println(F("An Error has occurred while mounting SPIFFS"));
         return;
     }
 
@@ -57,14 +54,14 @@ void setupWebserver()
     server.begin();
     if (!MDNS.begin(HOSTNAME))
     {
-        Serial.println("Error setting up MDNS responder!");
+        Serial.println(F("Error setting up MDNS responder!"));
         while (1)
         {
             delay(1000);
         }
     }
     MDNS.addService("http", "tcp", 80);
-    Serial.println("Webserver should be running");
+    Serial.println(F("Webserver should be running"));
 }
 
 /**
@@ -112,7 +109,7 @@ void onApiStatus(AsyncWebServerRequest *request)
 void onApiActionPause(AsyncWebServerRequest *request)
 {
     timerRunning = false;
-    Serial.println("Update timer paused");
+    Serial.println(F("Update timer paused"));
 
     request->send(200);
 };
@@ -137,7 +134,7 @@ void onApiActionTimerRestart(AsyncWebServerRequest *request)
 {
     // moment = millis();
     timerRunning = true;
-    Serial.println("Update timer restarted");
+    Serial.println(F("Update timer restarted"));
 
     request->send(200);
 }
@@ -221,7 +218,7 @@ bool processEpdColorSettings(AsyncWebServerRequest *request)
         AsyncWebParameter *fgColor = request->getParam("fgColor", true);
         preferences.putUInt("fgColor", strtol(fgColor->value().c_str(), NULL, 16));
         setFgColor(int(strtol(fgColor->value().c_str(), NULL, 16)));
-        Serial.print("Setting foreground color to ");
+        Serial.print(F("Setting foreground color to "));
         Serial.println(fgColor->value().c_str());
         settingsChanged = true;
     }
@@ -231,7 +228,7 @@ bool processEpdColorSettings(AsyncWebServerRequest *request)
 
         preferences.putUInt("bgColor", strtol(bgColor->value().c_str(), NULL, 16));
         setBgColor(int(strtol(bgColor->value().c_str(), NULL, 16)));
-        Serial.print("Setting background color to ");
+        Serial.print(F("Setting background color to "));
         Serial.println(bgColor->value().c_str());
         settingsChanged = true;
     }
@@ -250,7 +247,7 @@ void onApiEpdSettingsPost(AsyncWebServerRequest *request)
     {
         flashTemporaryLights(0, 255, 0);
 
-        Serial.println("Settings changed");
+        Serial.println(F("Settings changed"));
     }
 }
 
@@ -384,7 +381,7 @@ void onApiSettingsPost(AsyncWebServerRequest *request)
     {
         flashTemporaryLights(0, 255, 0);
 
-        Serial.println("Settings changed");
+        Serial.println(F("Settings changed"));
     }
 }
 
@@ -504,7 +501,7 @@ void onApiLightsFlash(AsyncWebServerRequest *request)
 void onApiLightsSetColor(AsyncWebServerRequest *request)
 {
     String rgbColor = request->pathArg(0);
-    int r, g, b;
+    uint r, g, b;
     sscanf(rgbColor.c_str(), "%02x%02x%02x", &r, &g, &b);
     setLights(r, g, b);
     request->send(200, "text/plain", rgbColor);
