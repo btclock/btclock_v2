@@ -49,7 +49,6 @@ void setup()
   setupComponents();
   setupPreferences();
 #ifndef NO_DISPLAY
-  resetAllDisplays();
   initDisplays();
 #endif
   setupWifi();

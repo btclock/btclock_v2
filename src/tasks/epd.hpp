@@ -33,8 +33,6 @@ typedef struct {
 void setupDisplays();
 void initDisplays();
 void taskEpd(void *pvParameters);
-void resetAllDisplays();
-void resetSingleDisplay(int i);
 
 std::array<String, 7> getCurrentEpdContent();
 

@@ -14,10 +14,10 @@
 
 Native_Pin EPD_CS[NUM_SCREENS] = {Native_Pin(2), Native_Pin(4), Native_Pin(6), Native_Pin(10), Native_Pin(33), Native_Pin(21), Native_Pin(17)};
 Native_Pin EPD_BUSY[NUM_SCREENS] = {Native_Pin(3), Native_Pin(5), Native_Pin(7), Native_Pin(9), Native_Pin(37), Native_Pin(18), Native_Pin(16)};
-MCP23X17_Pin EPD_RESET_MPD[NUM_SCREENS] = {MCP23X17_Pin(mcp,8), MCP23X17_Pin(mcp, 9), MCP23X17_Pin(mcp, 10), MCP23X17_Pin(mcp, 11), MCP23X17_Pin(mcp, 12), MCP23X17_Pin(mcp, 13), MCP23X17_Pin(mcp, 14)};
+MCP23X17_Pin EPD_RESET_MPD[NUM_SCREENS] = {MCP23X17_Pin(mcp, 8), MCP23X17_Pin(mcp, 9), MCP23X17_Pin(mcp, 10), MCP23X17_Pin(mcp, 11), MCP23X17_Pin(mcp, 12), MCP23X17_Pin(mcp, 13), MCP23X17_Pin(mcp, 14)};
 
 Native_Pin EPD_DC = Native_Pin(14);
-//const char RST_PIN = 15;
+// const char RST_PIN = 15;
 #elif defined(IS_S2)
 
 // reversed
@@ -89,8 +89,7 @@ TaskHandle_t tasks[NUM_SCREENS];
 SemaphoreHandle_t epdUpdateSemaphore[NUM_SCREENS];
 //
 
-//int *qrcode = (int *) ps_malloc(qrcodegen_BUFFER_LEN_MAX * sizeof(uint8_t));
-
+// int *qrcode = (int *) ps_malloc(qrcodegen_BUFFER_LEN_MAX * sizeof(uint8_t));
 
 void setupDisplays()
 {
@@ -98,49 +97,11 @@ void setupDisplays()
     xTaskCreate(taskEpd, "epd_task", 2048, NULL, 1, NULL);
 }
 
-void resetAllDisplays()
-{
-#ifdef NO_MCP
-    digitalWrite(RST_PIN, HIGH);
-    pinMode(RST_PIN, OUTPUT);
-    delay(20);
-    digitalWrite(RST_PIN, LOW);
-    delay(20);
-    digitalWrite(RST_PIN, HIGH);
-    delay(200);
-#else
-    for (int i = 0; i < NUM_SCREENS; i++)
-    {
-        resetSingleDisplay(i);
-    }
-#endif
-}
-
-void resetSingleDisplay(int i)
-{
-#ifndef NO_MCP
-    EPD_RESET_MPD[i].digitalWrite(HIGH);
-    delay(20);
-    EPD_RESET_MPD[i].digitalWrite(LOW);
-    delay(20);
-    EPD_RESET_MPD[i].digitalWrite(HIGH);
-    delay(200);
-#endif
-}
-
 void initDisplays()
 {
     for (uint i = 0; i < NUM_SCREENS; i++)
     {
-#ifndef NO_MCP
-        EPD_RESET_MPD[i].pinMode(OUTPUT);
-#endif
         displays[i].init();
-#ifndef NO_MCP
-        resetSingleDisplay(i);
-#endif
-
-        //  displays[i].epd2.init(SW_SCK, SW_MOSI, 115200, true, 20, false);
     }
 
     for (uint i = 0; i < NUM_SCREENS; i++)
@@ -200,9 +161,6 @@ void taskEpd(void *pvParameters)
             {
                 if (!updatedThisCycle)
                 {
-#ifdef NO_MCP
-                    resetAllDisplays();
-#endif
                     updatedThisCycle = true;
                 }
 
@@ -298,8 +256,6 @@ void showDigit(const uint dispNum, char chr, bool partial, const GFXfont *font)
 
 void fullRefresh(void *pvParameters)
 {
-    resetAllDisplays();
-
     for (uint i = 0; i < NUM_SCREENS; i++)
     {
         lastFullRefresh[i] = NULL;
@@ -321,10 +277,7 @@ void updateDisplay(void *pvParameters)
         if (epdContent[epdIndex].compareTo(currentEpdContent[epdIndex]) != 0)
         {
             currentEpdContent[epdIndex] = epdContent[epdIndex];
-#ifndef NO_MCP
-            displays[epdIndex].init(0, false);
-            resetSingleDisplay(epdIndex);
-#endif
+
             // displays[epdIndex].init(0, false);
             bool updatePartial = true;
 
@@ -353,4 +306,3 @@ void updateDisplay(void *pvParameters)
         xSemaphoreGive(epdUpdateSemaphore[epdIndex]);
     }
 }
-
