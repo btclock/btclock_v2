@@ -78,7 +78,7 @@ void onApiStatus(AsyncWebServerRequest *request)
     root["numScreens"] = NUM_SCREENS;
     JsonArray data = root.createNestedArray("data");
     JsonArray rendered = root.createNestedArray("rendered");
-    String epdContent[7];
+    String epdContent[NUM_SCREENS];
 
 #ifdef WITH_RGB_LED
 
@@ -166,6 +166,7 @@ void onApiActionUpdate(AsyncWebServerRequest *request)
 void onApiSettingsGet(AsyncWebServerRequest *request)
 {
     StaticJsonDocument<768> root;
+    root["numScreens"] = NUM_SCREENS;
     root["fgColor"] = getFgColor();
     root["bgColor"] = getBgColor();
     root["timerSeconds"] = timerSeconds;
@@ -403,7 +404,7 @@ void onApiShowTextAdvanced(AsyncWebServerRequest *request, JsonVariant &json)
 
     JsonArray screens = json.as<JsonArray>();
 
-    std::array<String, 7> epdContent;
+    std::array<String, NUM_SCREENS> epdContent;
     int i = 0;
     for (JsonVariant s : screens)
     {

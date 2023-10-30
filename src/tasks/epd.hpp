@@ -34,9 +34,9 @@ void setupDisplays();
 void initDisplays();
 void taskEpd(void *pvParameters);
 
-std::array<String, 7> getCurrentEpdContent();
+std::array<String, NUM_SCREENS> getCurrentEpdContent();
 
-void setEpdContent(std::array<String, 7> newEpdContent);
+void setEpdContent(std::array<String, NUM_SCREENS> newEpdContent);
 void splitText(const uint dispNum, String top, String bottom, bool partial);
 void showDigit(const uint dispNum, char chr, bool partial, const GFXfont *font);
 

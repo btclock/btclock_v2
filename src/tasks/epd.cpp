@@ -1,9 +1,27 @@
 #include "epd.hpp"
 
 #ifdef IS_S3
-Native_Pin EPD_CS[NUM_SCREENS] = {Native_Pin(2), Native_Pin(4), Native_Pin(6), Native_Pin(10), Native_Pin(33), Native_Pin(21), Native_Pin(17)};
-Native_Pin EPD_BUSY[NUM_SCREENS] = {Native_Pin(3), Native_Pin(5), Native_Pin(7), Native_Pin(9), Native_Pin(37), Native_Pin(18), Native_Pin(16)};
-MCP23X17_Pin EPD_RESET_MPD[NUM_SCREENS] = {MCP23X17_Pin(mcp, 8), MCP23X17_Pin(mcp, 9), MCP23X17_Pin(mcp, 10), MCP23X17_Pin(mcp, 11), MCP23X17_Pin(mcp, 12), MCP23X17_Pin(mcp, 13), MCP23X17_Pin(mcp, 14)};
+Native_Pin EPD_CS[NUM_SCREENS] = {
+    Native_Pin(2), Native_Pin(4), Native_Pin(6), Native_Pin(10), Native_Pin(33), Native_Pin(21), Native_Pin(17),
+    #if NUM_SCREENS == 9
+    Native_Pin(-1),
+    Native_Pin(-1),
+    #endif    
+};
+Native_Pin EPD_BUSY[NUM_SCREENS] = {
+    Native_Pin(3), Native_Pin(5), Native_Pin(7), Native_Pin(9), Native_Pin(37), Native_Pin(18), Native_Pin(16),
+    #if NUM_SCREENS == 9
+    Native_Pin(-1),
+    Native_Pin(-1),
+    #endif    
+};
+MCP23X17_Pin EPD_RESET_MPD[NUM_SCREENS] = {
+    MCP23X17_Pin(mcp, 8), MCP23X17_Pin(mcp, 9), MCP23X17_Pin(mcp, 10), MCP23X17_Pin(mcp, 11), MCP23X17_Pin(mcp, 12), MCP23X17_Pin(mcp, 13), MCP23X17_Pin(mcp, 14),
+    #if NUM_SCREENS == 9
+    MCP23X17_Pin(mcp, 15),
+    MCP23X17_Pin(mcp, 16)
+    #endif
+};
 
 Native_Pin EPD_DC = Native_Pin(14);
 
@@ -15,6 +33,10 @@ GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> displays[NUM_SCREENS] = {
     GxEPD2_213_B74(&EPD_CS[4], &EPD_DC, &EPD_RESET_MPD[4], &EPD_BUSY[4]),
     GxEPD2_213_B74(&EPD_CS[5], &EPD_DC, &EPD_RESET_MPD[5], &EPD_BUSY[5]),
     GxEPD2_213_B74(&EPD_CS[6], &EPD_DC, &EPD_RESET_MPD[6], &EPD_BUSY[6]),
+    #if NUM_SCREENS == 9
+    GxEPD2_213_B74(&EPD_CS[7], &EPD_DC, &EPD_RESET_MPD[7], &EPD_BUSY[7]),
+    GxEPD2_213_B74(&EPD_CS[8], &EPD_DC, &EPD_RESET_MPD[8], &EPD_BUSY[8]),
+    #endif
 };
 
 const int SEM_WAIT_TIME = 10000;
@@ -22,8 +44,8 @@ const int SEM_WAIT_TIME = 10000;
 
 uint32_t lastFullRefresh[NUM_SCREENS];
 
-std::array<String, 7> currentEpdContent;
-std::array<String, 7> epdContent;
+std::array<String, NUM_SCREENS> currentEpdContent;
+std::array<String, NUM_SCREENS> epdContent;
 TaskHandle_t tasks[NUM_SCREENS];
 SemaphoreHandle_t epdUpdateSemaphore[NUM_SCREENS];
 
@@ -127,12 +149,12 @@ void taskEpd(void *pvParameters)
     }
 }
 
-std::array<String, 7> getCurrentEpdContent()
+std::array<String, NUM_SCREENS> getCurrentEpdContent()
 {
     return currentEpdContent;
 }
 
-void setEpdContent(std::array<String, 7> newEpdContent)
+void setEpdContent(std::array<String, NUM_SCREENS> newEpdContent)
 {
     epdContent = newEpdContent;
 }

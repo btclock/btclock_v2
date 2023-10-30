@@ -35,6 +35,7 @@ fetch('/api/settings', {
             document.getElementById('bgColor').querySelector('[value="0xF800"]').remove();
         }
 
+        document.getElementById('customText').setAttribute('maxlength', jsonData.numScreens);
         document.getElementById('output').classList.add("fg-" + jsonData.fgColor.toString(16));
         document.getElementById('output').classList.add("bg-" + jsonData.bgColor.toString(16));
 

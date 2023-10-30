@@ -16,5 +16,5 @@ class CustomTextScreen {
         static void showScreen();
         static std::array<String, NUM_SCREENS> getEpdContent();
         static void setSimpleText(const String& text);
-        static void setText(std::array<String, 7> customContent);
+        static void setText(std::array<String, NUM_SCREENS> customContent);
 };

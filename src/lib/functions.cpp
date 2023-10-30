@@ -363,7 +363,7 @@ void previousScreen()
 
 void showNetworkSettings()
 {
-    std::array<String, 7> epdContent = {"", "", "", "", "", "", ""};
+    std::array<String, NUM_SCREENS> epdContent = {"", "", "", "", "", "", ""};
 
     String ipAddr = WiFi.localIP().toString();
     String subNet = WiFi.subnetMask().toString();
