@@ -15,7 +15,8 @@
 #include "screens/countdown.hpp"
 #include "screens/custom_text.hpp"
 #include "screens/halvingcountdown.hpp"
-
+#include <native_pin.hpp>
+#include <mcp23x17_pin.hpp>
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>

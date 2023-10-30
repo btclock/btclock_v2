@@ -1,12 +1,23 @@
 #include "epd.hpp"
 
 #ifdef IS_S3
-const char EPD_CS[NUM_SCREENS] = {2, 4, 6, 10, 33, 21, 17};
-const char EPD_BUSY[NUM_SCREENS] = {3, 5, 7, 9, 37, 18, 16};
-const char EPD_RESET_MPD[NUM_SCREENS] = {8, 9, 10, 11, 12, 13, 14};
 
-const char EPD_DC = 14;
-const char RST_PIN = 15;
+// GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> displays[NUM_SCREENS] = {
+//     GxEPD2_213_B74(&Native_Pin(EPD_CS[0]), &Native_Pin(EPD_DC), &MCP23X17_Pin(mcp, EPD_RESET_MPD[0]), &Native_Pin(EPD_BUSY[0])),
+//     GxEPD2_213_B74(&Native_Pin(EPD_CS[1]), &Native_Pin(EPD_DC), &MCP23X17_Pin(mcp, EPD_RESET_MPD[1]), &Native_Pin(EPD_BUSY[1])),
+//     GxEPD2_213_B74(&Native_Pin(EPD_CS[2]), &Native_Pin(EPD_DC), &MCP23X17_Pin(mcp, EPD_RESET_MPD[2]), &Native_Pin(EPD_BUSY[2])),
+//     GxEPD2_213_B74(&Native_Pin(EPD_CS[3]), &Native_Pin(EPD_DC), &MCP23X17_Pin(mcp, EPD_RESET_MPD[3]), &Native_Pin(EPD_BUSY[3])),
+//     GxEPD2_213_B74(&Native_Pin(EPD_CS[4]), &Native_Pin(EPD_DC), &MCP23X17_Pin(mcp, EPD_RESET_MPD[4]), &Native_Pin(EPD_BUSY[4])),
+//     GxEPD2_213_B74(&Native_Pin(EPD_CS[5]), &Native_Pin(EPD_DC), &MCP23X17_Pin(mcp, EPD_RESET_MPD[5]), &Native_Pin(EPD_BUSY[5])),
+//     GxEPD2_213_B74(&Native_Pin(EPD_CS[6]), &Native_Pin(EPD_DC), &MCP23X17_Pin(mcp, EPD_RESET_MPD[6]), &Native_Pin(EPD_BUSY[6])),
+// };
+
+Native_Pin EPD_CS[NUM_SCREENS] = {Native_Pin(2), Native_Pin(4), Native_Pin(6), Native_Pin(10), Native_Pin(33), Native_Pin(21), Native_Pin(17)};
+Native_Pin EPD_BUSY[NUM_SCREENS] = {Native_Pin(3), Native_Pin(5), Native_Pin(7), Native_Pin(9), Native_Pin(37), Native_Pin(18), Native_Pin(16)};
+MCP23X17_Pin EPD_RESET_MPD[NUM_SCREENS] = {MCP23X17_Pin(mcp,8), MCP23X17_Pin(mcp, 9), MCP23X17_Pin(mcp, 10), MCP23X17_Pin(mcp, 11), MCP23X17_Pin(mcp, 12), MCP23X17_Pin(mcp, 13), MCP23X17_Pin(mcp, 14)};
+
+Native_Pin EPD_DC = Native_Pin(14);
+//const char RST_PIN = 15;
 #elif defined(IS_S2)
 
 // reversed
@@ -42,13 +53,13 @@ const int RST_PIN = 2;
 #ifdef IS_BW
 
 GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> displays[NUM_SCREENS] = {
-    GxEPD2_213_B74(EPD_CS[0], EPD_DC, /*RST=*/-1, EPD_BUSY[0]),
-    GxEPD2_213_B74(EPD_CS[1], EPD_DC, /*RST=*/-1, EPD_BUSY[1]),
-    GxEPD2_213_B74(EPD_CS[2], EPD_DC, /*RST=*/-1, EPD_BUSY[2]),
-    GxEPD2_213_B74(EPD_CS[3], EPD_DC, /*RST=*/-1, EPD_BUSY[3]),
-    GxEPD2_213_B74(EPD_CS[4], EPD_DC, /*RST=*/-1, EPD_BUSY[4]),
-    GxEPD2_213_B74(EPD_CS[5], EPD_DC, /*RST=*/-1, EPD_BUSY[5]),
-    GxEPD2_213_B74(EPD_CS[6], EPD_DC, /*RST=*/-1, EPD_BUSY[6]),
+    GxEPD2_213_B74(&EPD_CS[0], &EPD_DC, &EPD_RESET_MPD[0], &EPD_BUSY[0]),
+    GxEPD2_213_B74(&EPD_CS[1], &EPD_DC, &EPD_RESET_MPD[1], &EPD_BUSY[1]),
+    GxEPD2_213_B74(&EPD_CS[2], &EPD_DC, &EPD_RESET_MPD[2], &EPD_BUSY[2]),
+    GxEPD2_213_B74(&EPD_CS[3], &EPD_DC, &EPD_RESET_MPD[3], &EPD_BUSY[3]),
+    GxEPD2_213_B74(&EPD_CS[4], &EPD_DC, &EPD_RESET_MPD[4], &EPD_BUSY[4]),
+    GxEPD2_213_B74(&EPD_CS[5], &EPD_DC, &EPD_RESET_MPD[5], &EPD_BUSY[5]),
+    GxEPD2_213_B74(&EPD_CS[6], &EPD_DC, &EPD_RESET_MPD[6], &EPD_BUSY[6]),
 };
 
 // GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> * displays2 = (GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> *) ps_malloc(7 * sizeof (GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT>));
@@ -108,11 +119,11 @@ void resetAllDisplays()
 void resetSingleDisplay(int i)
 {
 #ifndef NO_MCP
-    mcp.digitalWrite(EPD_RESET_MPD[i], HIGH);
+    EPD_RESET_MPD[i].digitalWrite(HIGH);
     delay(20);
-    mcp.digitalWrite(EPD_RESET_MPD[i], LOW);
+    EPD_RESET_MPD[i].digitalWrite(LOW);
     delay(20);
-    mcp.digitalWrite(EPD_RESET_MPD[i], HIGH);
+    EPD_RESET_MPD[i].digitalWrite(HIGH);
     delay(200);
 #endif
 }
@@ -122,7 +133,7 @@ void initDisplays()
     for (uint i = 0; i < NUM_SCREENS; i++)
     {
 #ifndef NO_MCP
-        mcp.pinMode(EPD_RESET_MPD[i], OUTPUT);
+        EPD_RESET_MPD[i].pinMode(OUTPUT);
 #endif
         displays[i].init();
 #ifndef NO_MCP
