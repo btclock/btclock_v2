@@ -75,7 +75,7 @@ void onApiStatus(AsyncWebServerRequest *request)
     StaticJsonDocument<512> root;
     root["currentScreen"] = String(getCurrentScreen());
     root["timerRunning"] = timerRunning;
-
+    root["numScreens"] = NUM_SCREENS;
     JsonArray data = root.createNestedArray("data");
     JsonArray rendered = root.createNestedArray("rendered");
     String epdContent[7];

@@ -25,8 +25,7 @@ void HalvingCountdownScreen::init()
     for (int i = 0; i < NUM_SCREENS; i++)
     {
         epdContentP[i] = HalvingCountdownScreen::psramBuffer + i * maxStringLength;
-      //  strcpy(epdContent[i], "x");
-        strcpy(epdContentP[i], "x");
+        strcpy(epdContentP[i], "");
     }
     initialized = true;
     setupBlockNotify();
@@ -48,18 +47,12 @@ void HalvingCountdownScreen::showScreen()
 
     snprintf(HalvingCountdownScreen::epdContentP[0], maxStringLength, "BIT/COIN");
     snprintf(HalvingCountdownScreen::epdContentP[1], maxStringLength, "HALV/ING");
-    snprintf(HalvingCountdownScreen::epdContentP[2], maxStringLength, "%d/YRS", years);
+    snprintf(HalvingCountdownScreen::epdContentP[(NUM_SCREENS-5)], maxStringLength, "%d/YRS", years);
 
-    snprintf(HalvingCountdownScreen::epdContentP[3], maxStringLength, "%d/DAYS", days);
-    snprintf(HalvingCountdownScreen::epdContentP[4], maxStringLength, "%d/HRS", hours);
-    snprintf(HalvingCountdownScreen::epdContentP[5], maxStringLength, "%d/MINS", mins);
-    snprintf(HalvingCountdownScreen::epdContentP[6], maxStringLength, "TO/GO");
-
-    //     // strcpy(epdContent[2], sprintf(String(years) + "/YRS").c_str());
-    //    // snprintf(epdContent[2], sizeof(epdContent[2]), "%d/YRS", years);
-    //     //  strcpy(epdContent[3], String(days) + "/DAYS");
-    //     //    strcpy(epdContent[4], String(hours) + "/HRS");
-    //     //  strcpy(epdContent[5], String(mins) + "/MINS");
+    snprintf(HalvingCountdownScreen::epdContentP[(NUM_SCREENS-4)], maxStringLength, "%d/DAYS", days);
+    snprintf(HalvingCountdownScreen::epdContentP[(NUM_SCREENS-3)], maxStringLength, "%d/HRS", hours);
+    snprintf(HalvingCountdownScreen::epdContentP[(NUM_SCREENS-2)], maxStringLength, "%d/MINS", mins);
+    snprintf(HalvingCountdownScreen::epdContentP[(NUM_SCREENS-1)], maxStringLength, "TO/GO");
 }
 
 uint HalvingCountdownScreen::getNextHalvingBlockNr()

@@ -26,7 +26,7 @@
 #include "tasks/button.hpp"
 #include "tasks/led_handler.hpp"
 
-//WiFiClient wifiClientInsecure;
+WiFiClient wifiClientInsecure;
 WiFiClientSecure wifiClient;
 ESP32Time rtc(3600);
 

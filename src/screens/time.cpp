@@ -8,12 +8,13 @@ void TimeScreen::init() {
 }
 
 void TimeScreen::showScreen() {
-   // String(String(rtc.getDay()) + "/" + String(rtc.getMonth() + 1)).toCharArray(TimeScreen::dateString, 5);
-  //  rtc.getTime("%H:%M").toCharArray(TimeScreen::timeString, 5);
-
     std::string timeString = rtc.getTime("%H:%M").c_str();
     timeString.insert(timeString.begin(), NUM_SCREENS - timeString.length(), ' ');
-    TimeScreen::epdContent[0] = String(rtc.getDay()) + "/" + String(rtc.getMonth() + 1);
+    char dateTmp[6];
+    snprintf(dateTmp, 6, "%d/%d", rtc.getDay(), (rtc.getMonth() + 1));
+
+    TimeScreen::epdContent[0] = dateTmp;
+
     for (uint i = 1; i < NUM_SCREENS; i++)
     {
         TimeScreen::epdContent[i] = timeString[i];

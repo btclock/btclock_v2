@@ -18,20 +18,23 @@ bool useBitcoind = true;
 void checkBitcoinBlock(void *pvParameters)
 {
     uint blockHeight = preferences.getUInt("blockHeight", currentBlockHeight);
- 
-  
-    useBitcoind = preferences.getBool("useNode", false) && wifiClient.connect(preferences.getString("rpcHost", BITCOIND_HOST).c_str(), preferences.getUInt("rpcPort", BITCOIND_PORT));
+
+    useBitcoind = preferences.getBool("useNode", false) && wifiClientInsecure.connect(preferences.getString("rpcHost", BITCOIND_HOST).c_str(), preferences.getUInt("rpcPort", BITCOIND_PORT));
     if (useBitcoind)
         Serial.println(F("bitcoind node is reachable, using this for blocks."));
     else
         Serial.println(F("bitcoind node is not reachable, using mempool API instead."));
 
-    IPAddress result;
+    if (!useBitcoind)
+    {
+        IPAddress result;
 
-    int err = WiFi.hostByName(preferences.getString("mempoolInstance", DEFAULT_MEMPOOL_INSTANCE).c_str(), result) ;
+        int err = WiFi.hostByName(preferences.getString("mempoolInstance", DEFAULT_MEMPOOL_INSTANCE).c_str(), result);
 
-    if (err != 1) {
-        flashTemporaryLights(255, 0, 0);
+        if (err != 1)
+        {
+            flashTemporaryLights(255, 0, 0);
+        }
     }
 
     for (;;)
@@ -79,7 +82,6 @@ void checkBitcoinBlock(void *pvParameters)
                 Serial.print(F("Error in HTTP request to mempool API: "));
                 Serial.print(httpCode);
                 Serial.println(http->errorToString(httpCode));
-
             }
 
             http->end();
@@ -93,7 +95,7 @@ void checkBitcoinBlock(void *pvParameters)
             currentBlockHeight = blockHeight;
             preferences.putUInt("blockHeight", currentBlockHeight);
         }
-        delete http; 
+        delete http;
         vTaskDelay(pdMS_TO_TICKS(BLOCKNOTIFY_WAIT_TIME)); // wait 1 minute before checking again
     }
 }

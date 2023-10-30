@@ -26,7 +26,7 @@
 typedef std::function<void()> EventCallback;
 typedef std::function<void(uint number)> EventCallbackWithNumber;
 
-//extern WiFiClient wifiClientInsecure;
+extern WiFiClient wifiClientInsecure;
 extern WiFiClientSecure wifiClient;
 
 extern ESP32Time rtc;
