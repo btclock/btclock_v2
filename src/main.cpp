@@ -3,7 +3,6 @@
 #include <shared.hpp>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
-// #include <ESP32Time.h>
 #include <WiFiManager.h>
 
 #ifdef CONFIG_BT_ENABLED
@@ -18,7 +17,6 @@
 #include "screens/blockheight.hpp"
 #include "screens/ticker.hpp"
 #include "screens/time.hpp"
-//#include "screens/sats_per_dollar.hpp"
 #include "screens/halvingcountdown.hpp"
 
 #include "tasks/ha.hpp"
