@@ -28,6 +28,7 @@ void setCurrentScreen(uint screen);
 void handleScreenTasks(uint screen);
 void showNetworkSettings();
 void toggleScreenTimer();
+void onWifiLostIp(WiFiEvent_t event, WiFiEventInfo_t info);
 
 void timebasedChangeTask(void *parameter);
 

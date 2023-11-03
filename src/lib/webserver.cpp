@@ -76,6 +76,11 @@ void onApiStatus(AsyncWebServerRequest *request)
     root["currentScreen"] = String(getCurrentScreen());
     root["timerRunning"] = timerRunning;
     root["numScreens"] = NUM_SCREENS;
+    root["espUptime"] = esp_timer_get_time() / 1000000;
+    root["espFreeHeap"] = ESP.getFreeHeap();
+    root["espHeapSize"] = ESP.getHeapSize();
+    root["espFreePsram"] = ESP.getFreePsram();
+    root["espPsramSize"] = ESP.getPsramSize();
     JsonArray data = root.createNestedArray("data");
     JsonArray rendered = root.createNestedArray("rendered");
     String epdContent[NUM_SCREENS];

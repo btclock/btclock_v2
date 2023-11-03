@@ -57,6 +57,20 @@
                 </span>
               </p>
             </div>
+            <hr>
+            <div>
+              <div class="progress" role="progressbar" aria-label="Memory usage" aria-valuenow="{{ memUsage }}" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar progress-bar-striped" style="width: {{ memUsage }}%">{{ memUsage }}%</div>
+              </div>
+              <div class="d-flex justify-content-between">
+                <div>Memory usage</div>
+                <div>{{ memFree }} / {{ memTotal }} kB</div>
+              </div>
+            </div>
+            <hr>
+            <div>
+              <p>Uptime: {{#if uptime.h }}{{ uptime.h }}h {{/if}}{{ uptime.m }}m {{ uptime.s }}s</p>
+            </div>
           </div>
         </div>
       </script>

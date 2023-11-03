@@ -28,7 +28,7 @@ void minuteTask(void * parameter) {
     if(rtc.getSecond() != 0) { // Reset the event triggered flag if the second is not 0
       eventTriggered = false;
     }
-    vTaskDelay(pdMS_TO_TICKS(500)); // Sleep for 500 milliseconds to avoid busy waiting
+    vTaskDelay(pdMS_TO_TICKS(1000)); // Sleep for 1000 milliseconds to avoid busy waiting
     #endif
   }
 }

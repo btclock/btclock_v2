@@ -64,7 +64,7 @@ void setupComponents()
     // Serial.println(F("Leds should be on"));
 
 #ifndef NO_MCP
-    if (!mcp.begin_I2C())
+    if (!mcp.begin_I2C(0x20))
     {
         Serial.println(F("Error MCP23017"));
         pixels.setPixelColor(0, pixels.Color(255, 0, 0));
@@ -143,6 +143,8 @@ void setupWifi()
     }
 #endif
 
+    //WiFi.persistent(true);
+    WiFi.enableLongRange(false);
     setupSoftAP();
 
     wm.setConfigPortalTimeout(preferences.getUInt("wpTimeout", 600));
@@ -156,6 +158,12 @@ void setupWifi()
       softAP_password.c_str()); });
 
     bool ac = wm.autoConnect(softAP_SSID.c_str(), softAP_password.c_str());
+    WiFi.onEvent(onWifiLostIp, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_LOST_IP);
+
+}
+
+void onWifiLostIp(WiFiEvent_t event, WiFiEventInfo_t info) {
+    ESP.restart();
 }
 
 void setupPreferences()

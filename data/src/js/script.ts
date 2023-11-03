@@ -2,6 +2,23 @@ import './helpers.js';
 
 var screens = ["Block Height", "Moscow Time", "Ticker", "Time", "Halving countdown"];
 
+toTime = (secs) => {
+    var hours = Math.floor(secs / (60 * 60));
+
+    var divisor_for_minutes = secs % (60 * 60);
+    var minutes = Math.floor(divisor_for_minutes / 60);
+
+    var divisor_for_seconds = divisor_for_minutes % 60;
+    var seconds = Math.ceil(divisor_for_seconds);
+
+    var obj = {
+        "h": hours,
+        "m": minutes,
+        "s": seconds
+    };
+    return obj;
+}
+
 getBcStatus = () => {
     fetch('/api/status', {
         method: 'get'
@@ -11,7 +28,7 @@ getBcStatus = () => {
             var source = document.getElementById("entry-template").innerHTML;
             var template = Handlebars.compile(source);
 
-            var context = { timerRunning: jsonData.timerRunning, currentScreen: jsonData.currentScreen, rendered: jsonData.rendered, data: jsonData.data, screens: screens, ledStatus: jsonData.ledStatus ? jsonData.ledStatus.map((t) => (t).toString(16)) : [] };
+            var context = { timerRunning: jsonData.timerRunning, memUsage: Math.round(jsonData.espFreeHeap / jsonData.espHeapSize * 100), memFree: (jsonData.espFreeHeap / 1000), memTotal: (jsonData.espHeapSize / 1000), uptime: toTime(jsonData.espUptime), currentScreen: jsonData.currentScreen, rendered: jsonData.rendered, data: jsonData.data, screens: screens, ledStatus: jsonData.ledStatus ? jsonData.ledStatus.map((t) => (t).toString(16)) : [] };
 
 
             document.getElementById('output').innerHTML = template(context);
