@@ -29,7 +29,8 @@ jobs:
           python-version: '3.9'
       - name: Get current date
         id: dateAndTime
-        run: echo "::set-output name=dateAndTime::$(date +'%Y-%m-%d-%H:%M')"
+        # run: echo "::set-output name=dateAndTime::$(date +'%Y-%m-%d-%H:%M')"
+        run: echo "dateAndTime=$(date +'%Y-%m-%d-%H:%M')" >> $GITHUB_OUTPUT
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
 
