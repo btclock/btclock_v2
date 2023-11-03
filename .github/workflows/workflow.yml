@@ -1,6 +1,9 @@
 name: BTClock CI
 
-on: [push]
+on: 
+  push:
+    tags:
+      - '*'
 
 jobs:
   build:
@@ -24,6 +27,9 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: '3.9'
+      - name: Get current date
+        id: dateAndTime
+        run: echo "::set-output name=dateAndTime::$(date +'%Y-%m-%d-%H:%M')"
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
 
@@ -51,6 +57,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
+          name: 
           path: |
             .pio/build/esp32wemos-s3-mini_BW/*.bin
             output/full-firmware.bin
@@ -59,8 +66,7 @@ jobs:
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
-          tag: main
-          commit: main
+          name: release-${{ steps.date.outputs.dateAndTime }}
           artifacts: "output/full-firmware.bin,output/full-firmware.sha256,.pio/build/esp32wemos-s3-mini_BW/*.bin"
           allowUpdates: true
           removeArtifacts: true
