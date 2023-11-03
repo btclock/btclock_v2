@@ -64,7 +64,7 @@ jobs:
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
-          name: release-${{ steps.date.outputs.dateAndTime }}
+          name: release-${{ steps.dateAndTime.outputs.dateAndTime }}
           artifacts: "output/full-firmware.bin,output/full-firmware.sha256,.pio/build/esp32wemos-s3-mini_BW/*.bin"
           allowUpdates: true
           removeArtifacts: true
