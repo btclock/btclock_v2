@@ -57,12 +57,10 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: 
           path: |
             .pio/build/esp32wemos-s3-mini_BW/*.bin
             output/full-firmware.bin
             output/full-firmware.sha256
-
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
