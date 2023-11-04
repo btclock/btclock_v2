@@ -1,6 +1,7 @@
 #include "epd.hpp"
 
 #ifdef IS_S3
+#ifdef USE_UNIVERSAL_PIN
 Native_Pin EPD_CS[NUM_SCREENS] = {
     Native_Pin(2),
     Native_Pin(4),
@@ -66,7 +67,25 @@ GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> displays[NUM_SCREENS] = {
     GxEPD2_213_B74(&EPD9_CS, &EPD_DC, &EPD_RESET_MPD[8], &EPD9_BUSY),
 #endif
 };
+#else
+// Non Universal Pin
+const char EPD_CS[NUM_SCREENS] = {2, 4, 6, 10, 33, 21, 17};
+const char EPD_BUSY[NUM_SCREENS] = {3, 5, 7, 9, 37, 18, 16};
+const char EPD_RESET_MPD[NUM_SCREENS] = {8, 9, 10, 11, 12, 13, 14};
 
+const char EPD_DC = 14;
+const char RST_PIN = 15;
+
+GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> displays[NUM_SCREENS] = {
+    GxEPD2_213_B74(EPD_CS[0], EPD_DC, /*RST=*/-1, EPD_BUSY[0]),
+    GxEPD2_213_B74(EPD_CS[1], EPD_DC, /*RST=*/-1, EPD_BUSY[1]),
+    GxEPD2_213_B74(EPD_CS[2], EPD_DC, /*RST=*/-1, EPD_BUSY[2]),
+    GxEPD2_213_B74(EPD_CS[3], EPD_DC, /*RST=*/-1, EPD_BUSY[3]),
+    GxEPD2_213_B74(EPD_CS[4], EPD_DC, /*RST=*/-1, EPD_BUSY[4]),
+    GxEPD2_213_B74(EPD_CS[5], EPD_DC, /*RST=*/-1, EPD_BUSY[5]),
+    GxEPD2_213_B74(EPD_CS[6], EPD_DC, /*RST=*/-1, EPD_BUSY[6]),
+};
+#endif
 const int SEM_WAIT_TIME = 10000;
 #endif
 
@@ -85,9 +104,21 @@ void setupDisplays()
 
 void initDisplays()
 {
+    #ifndef USE_UNIVERSAL_PIN
+    resetAllDisplays();
+    #endif
+
     for (uint i = 0; i < NUM_SCREENS; i++)
     {
+        #ifndef USE_UNIVERSAL_PIN
+        mcp.pinMode(EPD_RESET_MPD[i], OUTPUT);
+        #endif
+
         displays[i].init();
+
+        #ifndef USE_UNIVERSAL_PIN
+        resetSingleDisplay(i);
+        #endif
     }
 
     for (uint i = 0; i < NUM_SCREENS; i++)
@@ -120,6 +151,24 @@ void initDisplays()
         xTaskNotifyGive(tasks[i]);
     }
     vTaskDelay(pdMS_TO_TICKS(displays[0].epd2.full_refresh_time));
+}
+
+void resetAllDisplays()
+{
+    for (int i = 0; i < NUM_SCREENS; i++)
+    {
+        resetSingleDisplay(i);
+    }
+}
+
+void resetSingleDisplay(int i)
+{
+    mcp.digitalWrite(EPD_RESET_MPD[i], HIGH);
+    delay(20);
+    mcp.digitalWrite(EPD_RESET_MPD[i], LOW);
+    delay(20);
+    mcp.digitalWrite(EPD_RESET_MPD[i], HIGH);
+    delay(200);
 }
 
 void taskEpd(void *pvParameters)
@@ -254,6 +303,8 @@ void showDigit(const uint dispNum, char chr, bool partial, const GFXfont *font)
 
 void fullRefresh(void *pvParameters)
 {
+    resetAllDisplays();
+
     for (uint i = 0; i < NUM_SCREENS; i++)
     {
         lastFullRefresh[i] = NULL;
@@ -275,6 +326,10 @@ extern "C" void updateDisplay(void *pvParameters) noexcept
         if (epdContent[epdIndex].compareTo(currentEpdContent[epdIndex]) != 0)
         {
             displays[epdIndex].init(0, false, 20); // Little longer reset duration because of MCP
+            #ifndef USE_UNIVERSAL_PIN
+            resetSingleDisplay(epdIndex);
+            #endif
+
             bool updatePartial = true;
 
             // Full Refresh every half hour
@@ -295,6 +350,7 @@ extern "C" void updateDisplay(void *pvParameters) noexcept
                 showDigit(epdIndex, epdContent[epdIndex].c_str()[0], updatePartial, &FONT_BIG);
             }
 
+            #ifdef USE_UNIVERSAL_PIN
             char tries = 0;
             while (tries < 3)
             {
@@ -308,6 +364,11 @@ extern "C" void updateDisplay(void *pvParameters) noexcept
                 delay(100);
                 tries++;
             }
+            #else
+                displays[epdIndex].display(updatePartial);
+                displays[epdIndex].hibernate();
+                currentEpdContent[epdIndex] = epdContent[epdIndex];
+            #endif
 
 #endif
         }

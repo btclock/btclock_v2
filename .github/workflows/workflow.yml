@@ -35,16 +35,16 @@ jobs:
         run: pip install --upgrade platformio
 
       - name: Build BTClock firmware
-        run: pio run -e esp32wemos-s3-mini_BW 
+        run: pio run -e default 
 
       - name: Build BTClock filesystem
-        run: pio run -e esp32wemos-s3-mini_BW --target buildfs
+        run: pio run -e default --target buildfs
 
       - name: Install esptools.py
         run: pip install --upgrade esptool
 
       - name: Create merged firmware binary
-        run: mkdir -p output && esptool.py --chip esp32s3 merge_bin -o output/full-firmware.bin --flash_mode dio 0x0000 .pio/build/esp32wemos-s3-mini_BW/bootloader.bin 0x8000 .pio/build/esp32wemos-s3-mini_BW/partitions.bin 0xe000 ~/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin 0x10000 .pio/build/esp32wemos-s3-mini_BW/firmware.bin 0x330000 .pio/build/esp32wemos-s3-mini_BW/spiffs.bin
+        run: mkdir -p output && esptool.py --chip esp32s3 merge_bin -o output/full-firmware.bin --flash_mode dio 0x0000 .pio/build/default/bootloader.bin 0x8000 .pio/build/default/partitions.bin 0xe000 ~/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin 0x10000 .pio/build/default/firmware.bin 0x330000 .pio/build/default/spiffs.bin
 
       - name: Create checksum for merged binary
         run: shasum -a 256 output/full-firmware.bin | awk '{print $1}' > output/full-firmware.sha256
@@ -59,14 +59,14 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           path: |
-            .pio/build/esp32wemos-s3-mini_BW/*.bin
+            .pio/build/default/*.bin
             output/full-firmware.bin
             output/full-firmware.sha256
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
           name: release-${{ steps.dateAndTime.outputs.dateAndTime }}
-          artifacts: "output/full-firmware.bin,output/full-firmware.sha256,.pio/build/esp32wemos-s3-mini_BW/*.bin"
+          artifacts: "output/full-firmware.bin,output/full-firmware.sha256,.pio/build/default/*.bin"
           allowUpdates: true
           removeArtifacts: true
       - name: Pushes full-firmware.bin to web flasher

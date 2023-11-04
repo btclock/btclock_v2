@@ -15,9 +15,11 @@
 #include "screens/countdown.hpp"
 #include "screens/custom_text.hpp"
 #include "screens/halvingcountdown.hpp"
+#ifdef USE_UNIVERSAL_PIN
 #include <native_pin.hpp>
 #include <mcp23x17_pin.hpp>
 #include <universal_pin.hpp>
+#endif
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -37,6 +39,8 @@ void taskEpd(void *pvParameters);
 
 std::array<String, NUM_SCREENS> getCurrentEpdContent();
 
+void resetAllDisplays();
+void resetSingleDisplay(int i);
 void setEpdContent(std::array<String, NUM_SCREENS> newEpdContent);
 void splitText(const uint dispNum, String top, String bottom, bool partial);
 void showDigit(const uint dispNum, char chr, bool partial, const GFXfont *font);
