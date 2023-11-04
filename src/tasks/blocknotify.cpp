@@ -82,6 +82,9 @@ void checkBitcoinBlock(void *pvParameters)
                 Serial.print(F("Error in HTTP request to mempool API: "));
                 Serial.print(httpCode);
                 Serial.println(http->errorToString(httpCode));
+                  if (httpCode == -1) {
+                    WiFi.reconnect();
+                  }
             }
 
             http->end();

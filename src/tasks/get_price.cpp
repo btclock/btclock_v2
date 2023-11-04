@@ -56,6 +56,9 @@ void taskGetPrice(void *pvParameters)
             {
                 Serial.print(F("Error retrieving BTC/USD price (CoinGecko). HTTP status code: "));
                 Serial.println(httpCode);
+                if (httpCode == -1) {
+                    WiFi.reconnect();
+                }
             }
         } else {
 
@@ -86,6 +89,9 @@ void taskGetPrice(void *pvParameters)
             {
                 Serial.print(F("Error retrieving BTC/USD price (CoinDesk). HTTP status code: "));
                 Serial.println(httpCode);
+                if (httpCode == -1) {
+                    WiFi.reconnect();
+                }
             }
         }
 
