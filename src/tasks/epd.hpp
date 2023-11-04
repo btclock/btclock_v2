@@ -17,6 +17,7 @@
 #include "screens/halvingcountdown.hpp"
 #include <native_pin.hpp>
 #include <mcp23x17_pin.hpp>
+#include <universal_pin.hpp>
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -42,5 +43,5 @@ void showDigit(const uint dispNum, char chr, bool partial, const GFXfont *font);
 
 void refreshDisplay(void *pvParameters);
 void fullRefresh(void *pvParameters);
-void updateDisplay(void *pvParameters);
+extern "C" void updateDisplay(void *pvParameters) noexcept;
 //void genQrCode(String text, uint8_t *qrcode[qrcodegen_BUFFER_LEN_MAX]);
