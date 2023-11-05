@@ -85,7 +85,7 @@ void setupComponents()
         pixels.show();
         //  delay(200);
         pinMode(MCP_INT_PIN, INPUT);
-        mcp.setupInterrupts(true, false, LOW);
+        mcp.setupInterrupts(false, false, LOW);
     }
 #endif
 

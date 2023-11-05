@@ -3,71 +3,70 @@
  * Button 2: Next Screen
  * Button 3: Previous Screen
  * Button 4: Queue full EPD update
-*/
+ */
 
 #include "button.hpp"
 #ifndef NO_MCP
 TaskHandle_t buttonTaskHandle = NULL;
-// Define a type for the event callback
 std::vector<EventCallback> buttonEventCallbacks; // Define a vector to hold multiple event callbacks
-volatile boolean buttonPressed = false;
+const TickType_t debounceDelay = pdMS_TO_TICKS(50);
+TickType_t lastDebounceTime = 0;
 
 void buttonTask(void *parameter)
 {
     while (1)
     {
-        if (!digitalRead(MCP_INT_PIN))
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        TickType_t currentTime = xTaskGetTickCount();
+        if ((currentTime - lastDebounceTime) >= debounceDelay)
         {
-            uint pin = mcp.getLastInterruptPin();
-            if (pin == 3) {
-              //  xTaskCreate(fullRefresh, "FullRefresh", 2048, NULL, 1, NULL); 
-              toggleScreenTimer();
-            }
-            else if (pin == 1)
-            {
-                previousScreen();
-            }
-            else if (pin == 2)
-            {
-                nextScreen();
-            }
-            else if (pin == 0)
-            {
-                showNetworkSettings();
-            }
+            lastDebounceTime = currentTime;
 
-            vTaskDelay(250); // debounce
-            mcp.clearInterrupts(); // clear
+            if (!digitalRead(MCP_INT_PIN))
+            {
+                uint pin = mcp.getLastInterruptPin();
+
+                switch (pin)
+                {
+                case 3:
+                    toggleScreenTimer();
+                    break;
+                case 2:
+                    nextScreen();
+                    break;
+                case 1:
+                    previousScreen();
+                    break;
+                case 0:
+                    showNetworkSettings();
+                    break;
+                }
+            }
+            mcp.clearInterrupts();
+            // Very ugly, but for some reason this is necessary
+            while (!digitalRead(MCP_INT_PIN))
+            {
+                mcp.clearInterrupts();
+            }
         }
-
-        vTaskDelay(pdMS_TO_TICKS(250));
     }
 }
 
 void IRAM_ATTR handleButtonInterrupt()
 {
-    buttonPressed = true;
-    // Serial.println(F("ISR"));
-    // uint pin = mcp.getLastInterruptPin();
-
-    // if (pin == 1)
-    // {
-    //     nextScreen();
-    // }
-    // else if (pin == 2)
-    // {
-    //     previousScreen();
-    // }
-    // vTaskDelay(pdMS_TO_TICKS(250));
-
-    // mcp.clearInterrupts();
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    xTaskNotifyFromISR(buttonTaskHandle, 0, eNoAction, &xHigherPriorityTaskWoken);
+    if (xHigherPriorityTaskWoken == pdTRUE)
+    {
+        portYIELD_FROM_ISR();
+    }
 }
 
 void setupButtonTask()
 {
     xTaskCreate(buttonTask, "ButtonTask", 4096, NULL, 1, &buttonTaskHandle); // Create the FreeRTOS task
     // Use interrupt instead of task
-    // attachInterrupt(MCP_INT_PIN, handleButtonInterrupt, FALLING);
+    attachInterrupt(MCP_INT_PIN, handleButtonInterrupt, CHANGE);
 }
 
 void registerNewButtonCallback(const EventCallback cb)

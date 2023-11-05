@@ -62,7 +62,6 @@ void setup()
     BlockHeightScreen::init();
     HalvingCountdownScreen::init();
     TickerScreen::init();
- //   SatsPerDollarScreen::init();
 
 #ifdef WITH_BUTTONS
     setupButtonTask();
@@ -77,15 +76,15 @@ void setup()
     registerNewBlockCallback(BlockHeightScreen::onNewBlock);
     registerNewBlockCallback(HalvingCountdownScreen::onNewBlock);
     registerNewPriceCallback(TickerScreen::onPriceUpdate);
-//    registerNewPriceCallback(SatsPerDollarScreen::onPriceUpdate);
 
     setupDisplays();
-  } else {
+  }
+  else
+  {
     setupI2C();
   }
 }
 
 void loop()
 {
-  // put your main code here, to run repeatedly:
 }
