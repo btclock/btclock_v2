@@ -374,18 +374,21 @@ void showNetworkSettings()
     String ipAddr = WiFi.localIP().toString();
     String subNet = WiFi.subnetMask().toString();
 
-    epdContent[1] = "IP/Subnet";
+    epdContent[0] = "IP/Subnet";
 
     int ipAddrPos = 0;
     int subnetPos = 0;
     for (int i = 0; i < 4; i++)
     {
-        epdContent[2 + i] = ipAddr.substring(0, ipAddr.indexOf('.')) + "/" + subNet.substring(0, subNet.indexOf('.'));
+        epdContent[1 + i] = ipAddr.substring(0, ipAddr.indexOf('.')) + "/" + subNet.substring(0, subNet.indexOf('.'));
         ipAddrPos = ipAddr.indexOf('.') + 1;
         subnetPos = subNet.indexOf('.') + 1;
         ipAddr = ipAddr.substring(ipAddrPos);
         subNet = subNet.substring(subnetPos);
     }
+    epdContent[NUM_SCREENS-2] = "RAM/Status";
+
+    epdContent[NUM_SCREENS-1] = String((int)round(ESP.getFreeHeap()/1000)) + "/" + (int)round(ESP.getHeapSize()/1000);
 
     CustomTextScreen::setText(epdContent);
 
