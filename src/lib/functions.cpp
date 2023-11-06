@@ -60,8 +60,25 @@ void setupComponents()
     pixels.show();
 #endif
 
-    // delay(3000);
-    // Serial.println(F("Leds should be on"));
+//     delay(6000);
+//     Serial.println(F("I2C Master"));
+
+// int i2c_master_port = 0;
+// i2c_config_t conf = {
+//     .mode = I2C_MODE_MASTER,
+//     .sda_io_num = 35,         // select SDA GPIO specific to your project
+//     .scl_io_num = 36,         // select SCL GPIO specific to your project
+//     .sda_pullup_en = GPIO_PULLUP_ENABLE,
+//     .scl_pullup_en = GPIO_PULLUP_ENABLE,
+//     .master = {
+//         .clk_speed = 400000,  
+//     }, // select frequency specific to your project
+//     .clk_flags = 0,                          // optional; you can use I2C_SCLK_SRC_FLAG_* flags to choose i2c source clock here
+// };
+
+// i2c_param_config(i2c_master_port, &conf);
+// ESP_ERROR_CHECK(i2c_driver_install(i2c_master_port, conf.mode, 0, 0, 0));
+Wire.begin(35, 36); 
 
 #ifndef NO_MCP
     if (!mcp.begin_I2C(0x20))
@@ -72,8 +89,8 @@ void setupComponents()
         pixels.setPixelColor(2, pixels.Color(255, 0, 0));
         pixels.setPixelColor(3, pixels.Color(255, 0, 0));
         pixels.show();
-        while (1)
-            ;
+        // while (1)
+        //     ;
     }
     else
     {
@@ -222,8 +239,8 @@ void handleScreenTasks(uint screen)
         vTaskSuspend(blockNotifyTaskHandle);
     if (getPriceTaskHandle)
         vTaskSuspend(getPriceTaskHandle);
-    if (minuteTaskHandle)
-        vTaskSuspend(minuteTaskHandle);
+    // if (minuteTaskHandle)
+    //     vTaskSuspend(minuteTaskHandle);
     switch (currentScreen)
     {
     case SCREEN_BLOCK_HEIGHT:
@@ -376,18 +393,23 @@ void showNetworkSettings()
     String ipAddr = WiFi.localIP().toString();
     String subNet = WiFi.subnetMask().toString();
 
-    epdContent[1] = "IP/Subnet";
+    epdContent[0] = "IP/Subnet";
 
     int ipAddrPos = 0;
     int subnetPos = 0;
     for (int i = 0; i < 4; i++)
     {
-        epdContent[2 + i] = ipAddr.substring(0, ipAddr.indexOf('.')) + "/" + subNet.substring(0, subNet.indexOf('.'));
+        epdContent[1 + i] = ipAddr.substring(0, ipAddr.indexOf('.')) + "/" + subNet.substring(0, subNet.indexOf('.'));
         ipAddrPos = ipAddr.indexOf('.') + 1;
         subnetPos = subNet.indexOf('.') + 1;
         ipAddr = ipAddr.substring(ipAddrPos);
         subNet = subNet.substring(subnetPos);
     }
+    epdContent[NUM_SCREENS-2] = "RAM/Status";
+
+  //  char buf[32];
+//    snprintf(buf, sizeof(buf), "%s/%s", round(ESP.getFreeHeap()/1000), );
+    epdContent[NUM_SCREENS-1] = String((int)round(ESP.getFreeHeap()/1000)) + "/" + (int)round(ESP.getHeapSize()/1000);
 
     CustomTextScreen::setText(epdContent);
 
