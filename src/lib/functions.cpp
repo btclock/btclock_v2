@@ -222,8 +222,6 @@ void handleScreenTasks(uint screen)
         vTaskSuspend(blockNotifyTaskHandle);
     if (getPriceTaskHandle)
         vTaskSuspend(getPriceTaskHandle);
-    if (minuteTaskHandle)
-        vTaskSuspend(minuteTaskHandle);
     switch (currentScreen)
     {
     case SCREEN_BLOCK_HEIGHT:
