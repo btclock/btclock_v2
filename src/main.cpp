@@ -87,5 +87,5 @@ void setup()
 
 void loop()
 {
-  vTaskDelay(pdMS_TO_TICKS(1000));
+  vTaskDelay(pdMS_TO_TICKS(5000));
 }
