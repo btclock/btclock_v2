@@ -1,44 +1,59 @@
 #include "minute.hpp"
 
 TaskHandle_t minuteTaskHandle = NULL;
- // Define a type for the event callback
+// Define a type for the event callback
 std::vector<EventCallback> minuteEventCallbacks; // Define a vector to hold multiple event callbacks
-bool eventTriggered = false; // Initialize the event triggered flag to false
+bool eventTriggered = false;                     // Initialize the event triggered flag to false
+const int usPerMinute = 60 * 1000000;
 
-void minuteTask(void * parameter) {
-  while(1) {
-    #ifdef IS_3C // wait 5 minutes in case of a 3 color screen otherwise it keeps refreshing
-    if(rtc.getMinute() % 5 == 0 && !eventTriggered) {
-      eventTriggered = true;
-      for(auto &callback : minuteEventCallbacks) { // Loop through all the event callbacks and call them
-        callback();
-      }
+void minuteTask(void *parameter)
+{
+
+  esp_timer_handle_t minuteTimer;
+  const esp_timer_create_args_t minuteTimerConfig = {
+      .callback = &minuteTimerISR,
+      .name = "minute_timer"};
+
+  esp_timer_create(&minuteTimerConfig, &minuteTimer);
+
+  time_t currentTime;
+  struct tm timeinfo;
+  time(&currentTime);
+  localtime_r(&currentTime, &timeinfo);
+  uint32_t secondsUntilNextMinute = 60 - timeinfo.tm_sec;
+
+  if (secondsUntilNextMinute > 0)
+    vTaskDelay(pdMS_TO_TICKS((secondsUntilNextMinute * 1000)));
+
+  esp_timer_start_periodic(minuteTimer, usPerMinute);
+
+  while (1)
+  {
+    for (auto &callback : minuteEventCallbacks)
+    {
+      callback();
     }
-    if(rtc.getMinute() % 5 != 0 && eventTriggered) { // Reset the event triggered flag if the second is not 0
-      eventTriggered = false;
-    }
-    vTaskDelay(pdMS_TO_TICKS(1000)); // Sleep for 1000 milliseconds to avoid busy waiting
-    #else
-    if(rtc.getSecond() == 0 && !eventTriggered) {
-      eventTriggered = true;
-      for(auto &callback : minuteEventCallbacks) { // Loop through all the event callbacks and call them
-        callback();
-      }
-    }
-    if(rtc.getSecond() != 0) { // Reset the event triggered flag if the second is not 0
-      eventTriggered = false;
-    }
-    vTaskDelay(pdMS_TO_TICKS(1000)); // Sleep for 1000 milliseconds to avoid busy waiting
-    #endif
+
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+  }
+}
+
+void IRAM_ATTR minuteTimerISR(void *arg)
+{
+  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+  vTaskNotifyGiveFromISR(minuteTaskHandle, &xHigherPriorityTaskWoken);
+  if (xHigherPriorityTaskWoken == pdTRUE)
+  {
+    portYIELD_FROM_ISR();
   }
 }
 
 void setupMinuteEvent()
 {
-    xTaskCreate(minuteTask, "MinuteTask", 4096, NULL, 1, &minuteTaskHandle); // Create the FreeRTOS task
+  xTaskCreate(minuteTask, "MinuteTask", 4096, NULL, 1, &minuteTaskHandle); // Create the FreeRTOS task
 }
 
 void registerNewMinuteCallback(const EventCallback cb)
 {
   minuteEventCallbacks.push_back(cb);
-} 
+}
