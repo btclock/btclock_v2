@@ -49,3 +49,7 @@ std::array<String, NUM_SCREENS> TickerScreen::getEpdContentSats() {
 
     return epdContentSats;
 }
+
+uint TickerScreen::getPrice() {
+    return price;
+}

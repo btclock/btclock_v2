@@ -67,7 +67,7 @@ void setupWebserver()
 /**
  * @Api
  * @Path("/api/status")
-*/
+ */
 void onApiStatus(AsyncWebServerRequest *request)
 {
     AsyncResponseStream *response = request->beginResponseStream("application/json");
@@ -110,7 +110,7 @@ void onApiStatus(AsyncWebServerRequest *request)
 /**
  * @Api
  * @Path("/api/action/pause")
-*/
+ */
 void onApiActionPause(AsyncWebServerRequest *request)
 {
     timerRunning = false;
@@ -122,7 +122,7 @@ void onApiActionPause(AsyncWebServerRequest *request)
 /**
  * @Api
  * @Path("/api/action/full_refresh")
-*/
+ */
 void onApiFullRefresh(AsyncWebServerRequest *request)
 {
 
@@ -134,7 +134,7 @@ void onApiFullRefresh(AsyncWebServerRequest *request)
 /**
  * @Api
  * @Path("/api/action/timer_restart")
-*/
+ */
 void onApiActionTimerRestart(AsyncWebServerRequest *request)
 {
     // moment = millis();
@@ -148,7 +148,7 @@ void onApiActionTimerRestart(AsyncWebServerRequest *request)
  * @Api
  * @Path("/api/action/update")
  * @Parameter int rate Time in minutes
-*/
+ */
 void onApiActionUpdate(AsyncWebServerRequest *request)
 {
     if (request->hasParam("rate"))
@@ -167,10 +167,10 @@ void onApiActionUpdate(AsyncWebServerRequest *request)
  * @Api
  * @Method GET
  * @Path("/api/settings")
-*/
+ */
 void onApiSettingsGet(AsyncWebServerRequest *request)
 {
-    StaticJsonDocument<768> root;
+    StaticJsonDocument<1536> root;
     root["numScreens"] = NUM_SCREENS;
     root["fgColor"] = getFgColor();
     root["bgColor"] = getBgColor();
@@ -212,7 +212,7 @@ void onApiSettingsGet(AsyncWebServerRequest *request)
 
     AsyncResponseStream *response = request->beginResponseStream("application/json");
     serializeJson(root, *response);
-    
+
     request->send(response);
 }
 

@@ -26,7 +26,7 @@ void setFgColor(int color)
 
 void showSetupQr(const String &ssid, const String &password)
 {
-    char displayIndex = 6;
+    uint displayIndex = 6;
 
     const String text = "WIFI:S:" + ssid + ";T:WPA;P:" + password + ";;";
 

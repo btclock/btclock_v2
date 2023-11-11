@@ -58,3 +58,7 @@ std::array<String, NUM_SCREENS> BlockHeightScreen::getEpdContent()
 
     return ret;
 }
+
+uint BlockHeightScreen::getBlockNr() {
+    return blockNr;
+}

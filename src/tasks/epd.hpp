@@ -11,10 +11,12 @@
 #include "screens/blockheight.hpp"
 #include "screens/ticker.hpp"
 #include "screens/time.hpp"
-#include "screens/sats_per_dollar.hpp"
+#include "screens/market_cap.hpp"
 #include "screens/countdown.hpp"
 #include "screens/custom_text.hpp"
 #include "screens/halvingcountdown.hpp"
+
+
 #ifdef USE_UNIVERSAL_PIN
 #include <native_pin.hpp>
 #include <mcp23x17_pin.hpp>

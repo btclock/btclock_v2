@@ -180,7 +180,9 @@ void setupPreferences()
                      {SCREEN_MSCW_TIME, "Sats per dollar"},
                      {SCREEN_BTC_TICKER, "Ticker"},
                      {SCREEN_TIME, "Time"},
-                     {SCREEN_HALVING_COUNTDOWN, "Halving countdown"}};
+                     {SCREEN_HALVING_COUNTDOWN, "Halving countdown"},
+                     {SCREEN_MARKET_CAP, "Market Cap"}
+                     };
 
 #ifdef WITH_RGB_LED
     pixels.setBrightness(preferences.getUInt("ledBrightness", 128));
@@ -225,22 +227,20 @@ void handleScreenTasks(uint screen)
     switch (currentScreen)
     {
     case SCREEN_BLOCK_HEIGHT:
-        if (blockNotifyTaskHandle)
-        {
-            vTaskResume(blockNotifyTaskHandle);
-        }
-        break;
     case SCREEN_HALVING_COUNTDOWN:
         if (blockNotifyTaskHandle)
             vTaskResume(blockNotifyTaskHandle);
         break;
     case SCREEN_BTC_TICKER:
-        if (getPriceTaskHandle)
-            vTaskResume(getPriceTaskHandle);
-        break;
     case SCREEN_MSCW_TIME:
         if (getPriceTaskHandle)
             vTaskResume(getPriceTaskHandle);
+        break;
+    case SCREEN_MARKET_CAP:
+        if (getPriceTaskHandle)
+            vTaskResume(getPriceTaskHandle);
+        if (blockNotifyTaskHandle)
+            vTaskResume(blockNotifyTaskHandle);
         break;
     case SCREEN_TIME:
         if (minuteTaskHandle)
@@ -388,7 +388,7 @@ void showNetworkSettings()
     }
     epdContent[NUM_SCREENS-2] = "RAM/Status";
 
-    epdContent[NUM_SCREENS-1] = String((int)round(ESP.getFreeHeap()/1000)) + "/" + (int)round(ESP.getHeapSize()/1000);
+    epdContent[NUM_SCREENS-1] = String((int)round(ESP.getFreeHeap()/1024)) + "/" + (int)round(ESP.getHeapSize()/1024);
 
     CustomTextScreen::setText(epdContent);
 

@@ -18,4 +18,5 @@ public:
     static void onPriceUpdate(uint price);
     static std::array<String, NUM_SCREENS> getEpdContent();
     static std::array<String, NUM_SCREENS> getEpdContentSats();
+    static uint getPrice();
 };

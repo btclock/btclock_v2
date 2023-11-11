@@ -17,4 +17,5 @@ public:
     static void showScreen();
     static void onNewBlock(uint blockNr);
     static std::array<String, NUM_SCREENS> getEpdContent();
+    static uint getBlockNr();
 };

@@ -192,6 +192,9 @@ void taskEpd(void *pvParameters)
         case SCREEN_HALVING_COUNTDOWN:
             epdContent = HalvingCountdownScreen::getEpdContent();
             break;
+        case SCREEN_MARKET_CAP:
+            epdContent = MarketCapScreen::getEpdContent();
+            break;
         case SCREEN_COUNTDOWN:
             epdContent = CountdownScreen::getEpdContent();
             break;
@@ -325,7 +328,7 @@ extern "C" void updateDisplay(void *pvParameters) noexcept
 
         if (epdContent[epdIndex].compareTo(currentEpdContent[epdIndex]) != 0)
         {
-            displays[epdIndex].init(0, false, 20); // Little longer reset duration because of MCP
+            displays[epdIndex].init(0, false); // Little longer reset duration because of MCP
             #ifndef USE_UNIVERSAL_PIN
             resetSingleDisplay(epdIndex);
             #endif

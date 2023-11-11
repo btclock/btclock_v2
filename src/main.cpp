@@ -18,6 +18,7 @@
 #include "screens/ticker.hpp"
 #include "screens/time.hpp"
 #include "screens/halvingcountdown.hpp"
+#include "screens/market_cap.hpp"
 
 #include "tasks/ha.hpp"
 #include "tasks/epd.hpp"
@@ -62,6 +63,7 @@ void setup()
     BlockHeightScreen::init();
     HalvingCountdownScreen::init();
     TickerScreen::init();
+    MarketCapScreen::init();
 
 #ifdef WITH_BUTTONS
     setupButtonTask();
