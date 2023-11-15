@@ -52,7 +52,7 @@ void setupWebserver()
 
     // Start server
     server.begin();
-    if (!MDNS.begin(HOSTNAME))
+    if (!MDNS.begin(getMyHostname()))
     {
         Serial.println(F("Error setting up MDNS responder!"));
         while (1)
@@ -61,6 +61,9 @@ void setupWebserver()
         }
     }
     MDNS.addService("http", "tcp", 80);
+    MDNS.addServiceTxt("http", "tcp", "model", "BTClock");
+    MDNS.addServiceTxt("http", "tcp", "version", "2.0");
+    MDNS.addServiceTxt("http", "tcp", "rev", GIT_REV);
     Serial.println(F("Webserver should be running"));
 }
 
@@ -184,7 +187,9 @@ void onApiSettingsGet(AsyncWebServerRequest *request)
     root["rpcUser"] = preferences.getString("rpcUser", BITCOIND_RPC_USER);
     root["rpcHost"] = preferences.getString("rpcHost", BITCOIND_HOST);
     root["mempoolInstance"] = preferences.getString("mempoolInstance", DEFAULT_MEMPOOL_INSTANCE);
-
+    root["hostnamePrefix"] = preferences.getString("hostnamePrefix", "btclock");
+    root["hostname"] = getMyHostname();
+    
 #ifdef IS_BW
     root["epdColors"] = 2;
 #else
@@ -287,6 +292,14 @@ void onApiSettingsPost(AsyncWebServerRequest *request)
         preferences.putString("mempoolInstance", mempoolInstance->value().c_str());
         Serial.print("Setting mempool instance to ");
         Serial.println(mempoolInstance->value().c_str());
+        settingsChanged = true;
+    }
+
+    if (request->hasParam("hostnamePrefix", true))
+    {
+        AsyncWebParameter *hostnamePrefix = request->getParam("hostnamePrefix", true);
+
+        preferences.putString("hostnamePrefix", hostnamePrefix->value().c_str());
         settingsChanged = true;
     }
 

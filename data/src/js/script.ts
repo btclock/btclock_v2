@@ -76,6 +76,7 @@ fetch('/api/settings', {
         document.getElementById('fullRefreshMin').value = jsonData.fullRefreshMin;
         document.getElementById('wpTimeout').value = jsonData.wpTimeout;
         document.getElementById('mempoolInstance').value = jsonData.mempoolInstance;
+        document.getElementById('hostnamePrefix').value = jsonData.hostnamePrefix;
 
         if (jsonData.gitRev)
             document.getElementById('gitRev').innerHTML = "Version: " + jsonData.gitRev;

@@ -5,6 +5,7 @@
 //#include <WiFiMulti.h>
 
 #include "config.h"
+#include "utils.hpp"
 #include "shared.hpp"
 #include "Adafruit_GFX.h"
 #include "lib/epd.hpp"

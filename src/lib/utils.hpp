@@ -4,3 +4,4 @@
 
 double getSupplyAtBlock(uint blockNr);
 std::string formatNumberWithSuffix(int64_t num);
+String getMyHostname();

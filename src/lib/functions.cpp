@@ -36,8 +36,8 @@ void setupSoftAP()
 {
     byte mac[6];
     WiFi.macAddress(mac);
-    softAP_SSID = String("BTClock" + String(mac[5], 16) + String(mac[1], 16));
-    WiFi.setHostname(softAP_SSID.c_str());
+    softAP_SSID = getMyHostname().c_str();
+    WiFi.setHostname(getMyHostname().c_str());
     softAP_password = base64::encode(String(mac[2], 16) + String(mac[4], 16) + String(mac[5], 16) + String(mac[1], 16)).substring(2, 10);
 }
 
